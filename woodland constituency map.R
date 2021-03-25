@@ -39,7 +39,7 @@ labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Percent 
                    woodland.pcon$pcon19nm , woodland.pcon$Quintiles, woodland.pcon$`Woodland (%)` ) %>% 
   lapply(htmltools::HTML)
 
-plot <- leaflet(options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
+plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
   setView(lng =  -3.13,
           lat = 54.90,zoom = 6) %>% #setView gives centre coordinates and zoom level
   
