@@ -140,7 +140,7 @@ pcons.areas2$`Woodland area (ha)` <- as.numeric(pcons.areas2$`Woodland area (ha)
 pcons.areas2 <- pcons.areas2 %>% mutate(across(where(is.numeric),round,1))
 pcons.areas2 <- pcons.areas2 %>% mutate(across(where(is.numeric),as.numeric))
 
-
+write.csv(pcons.areas2, file = "Woodland within constituencies.csv", row.names = F)
 
 pcons.areas <- st_transform(pcons.areas,4326)
 
