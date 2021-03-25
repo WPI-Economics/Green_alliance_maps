@@ -48,7 +48,7 @@ pallette7 <- c("#8a0000",
 #
 
 #factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
-numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Forecast percentage change in employments 2019-2025`, reverse = T)
+numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Forecast percentage change in employments 2019-2025`, reverse = F)
 
 
 #this makes the hover over popup label
@@ -89,6 +89,6 @@ title <- tags$div(HTML("Percentages of woodland within Westminster Parliamentary
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
 
-combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
-
-htmltools::save_html(combo, "index.html") #this saves it as an HTML page in the default folder.
+# combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
+# 
+# htmltools::save_html(combo, "index.html") #this saves it as an HTML page in the default folder.

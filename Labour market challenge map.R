@@ -69,7 +69,7 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   addLegend(pal = numpal1, 
             values = GA.2$"Relative labour market challenge score (100 = mean average constituency)",
             position = "topright",
-            title="100 = mean average constituency",
+            title="Labour market challenge score",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)
