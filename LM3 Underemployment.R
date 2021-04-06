@@ -32,21 +32,20 @@ GA.2 <- merge(pcons, GA.1, by.x = "pcon19cd", by.y = "ONS code")
 
 
 # MAP IT OUT
-pallette7 <- c("#8a0000",
-               "#c98271",
-               "#f1f1f1",
-               "#cfd4ec",
-               "#adb8e6")
+# pallette7 <- c("#8a0000",
+#                "#c98271",
+#                "#f1f1f1",
+#                "#cfd4ec",
+#                "#adb8e6")
 
-#660a0b
-#7c2d25
-#
-#
-#
-#
-#
-#
-#
+pallette7 <- c("#8a0000",
+               "#a94330",
+               "#c4725f",
+               "#dca091",
+               "#f0cfc7",
+               "#f6f6f6")
+
+
 
 #factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
 numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Underemployment % pre-pandemic (16-64)`, reverse = T)
@@ -74,7 +73,10 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   
   
   
-  addLegend(pal = numpal1, 
+  addLegend(className = "panel panel-default legend", 
+    pal = numpal1, 
+            bins = 5,
+            labFormat = labelFormat(suffix = "%"),
             values = GA.2$`Underemployment % pre-pandemic (16-64)`,
             position = "topright",
             title="Underemployment <br>
@@ -90,6 +92,7 @@ plot
 title <- tags$div(HTML("Proportion of population age 16-64 underemployed pre-pandemic"), 
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
+
 
 combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
 html_print(combo)

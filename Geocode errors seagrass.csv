@@ -1,0 +1,35 @@
+PlaceName,Location,Area,Area_Ha,source,in_uk,Found exactly,lat,lon
+Carlingford,Carlingford Lough,Northern Ireland,8.989361,Contemporary,FALSE,TRUE,54.05991152,-6.138657136
+Chichester Harbour,East Head,Hampshire and IoW,7.682877351,Contemporary,FALSE,TRUE,50.79121229,-0.913657643
+Chichester Harbour,Oar Rithe,Hampshire and IoW,8.709063726,Contemporary,FALSE,FALSE,50.7913402,-0.949153607
+Dundrum,Dundrum,Northern Ireland,5.118004,Contemporary,FALSE,FALSE,54.26198196,-5.842958457
+East Coast Scotland,Loch Ryan,Scotland,104.8,Contemporary,FALSE,TRUE,54.96538376,-5.041162937
+Eden Estuary,NA,Scotland,55.88,Contemporary,FALSE,FALSE,56.36432849,-2.877070002
+Fal,Penarrow Point,Cornwall,7.487362386,Contemporary,FALSE,TRUE,50.17515967,-5.057788256
+Helford,East of Passage Cove,Cornwall,0.75238138,Contemporary,FALSE,FALSE,50.09969248,-5.128966349
+Helford,Flushing,Cornwall,3.019870427,Contemporary,FALSE,TRUE,50.16623655,-5.069532174
+Isle of Wight,Seaview,Hampshire and IoW,0,Contemporary,FALSE,TRUE,50.73069997,-1.113846138
+Isle of Wight,Yarmouth,Hampshire and IoW,18.22747334,Contemporary,FALSE,TRUE,50.70658186,-1.499141995
+Leigh-on-Sea,Two Tree Island,Essex,120.8620906,Contemporary,FALSE,TRUE,51.53626786,0.630760544
+Londonderry,Bellarina,Northern Ireland,27.517784,Contemporary,FALSE,TRUE,55.1292451,-6.952513175
+Londonderry,Derry,Northern Ireland,162.814056,Contemporary,FALSE,TRUE,55.00152599,-7.30821397
+Plymouth Sound,Cellars Cove,Devon,5.7009,Contemporary,FALSE,TRUE,50.36398572,-4.144166242
+Plymouth Sound,Drakes Island,Devon,4.4148,Contemporary,FALSE,TRUE,50.35578753,-4.15343125
+Plymouth Sound,Firestone Bay,Devon,0.7628,Contemporary,FALSE,TRUE,50.36184404,-4.160658985
+Plymouth Sound,Tomb Rock,Devon,6.5806,Contemporary,FALSE,FALSE,50.36445553,-4.144163527
+Poole Harbour,Brands Bay,Dorset,0.129135111,Contemporary,FALSE,TRUE,50.67226878,-1.974587125
+Portsmouth Harbour,Beaulieu,Hampshire and IoW,21.23795441,Contemporary,FALSE,TRUE,50.81631343,-1.45316218
+Portsmouth Harbour,East Head,Hampshire and IoW,2.052351938,Contemporary,FALSE,TRUE,50.78755091,-0.913488312
+Salcombe,Kingsbridge,Devon,16.2664,Contemporary,FALSE,TRUE,50.28501203,-3.777587346
+Salcombe,NA,Devon,9.70274,Contemporary,FALSE,TRUE,50.23894652,-3.770113992
+South Wales,Burry Point,South Wales,10.672309,Contemporary,FALSE,TRUE,51.69269722,-4.253936694
+South Wales,Newport,South Wales,0.720529,Contemporary,FALSE,TRUE,51.589214,-2.997823348
+Strangford Lough,Strangford Lough,Northern Ireland,940.284318,Contemporary,FALSE,TRUE,54.51224393,-5.588906543
+Torbay,Breakwater,Devon,0.100001,Contemporary,FALSE,FALSE,50.40027703,-3.504134426
+Waterfoot,Waterfoot,Northern Ireland,81,Contemporary,FALSE,TRUE,55.06222819,-6.061360027
+Weymouth,Weymouth Bay,Dorset,84.900191,Contemporary,FALSE,TRUE,50.61914189,-2.430212094
+Drakes Island,NA,Devon,4.41,Historic,FALSE,TRUE,50.35536753,-4.15346407
+Dumfries area,NA,Scotland,NA,Historic,FALSE,FALSE,NA,
+Fal,NA,Devon,38.8,Historic,FALSE,FALSE,NA,
+Moray Firth,NA,Scotland,NA,Historic,FALSE,TRUE,57.83072864,-3.495918057
+Portland Harbour,NA,Dorset,1.59,Historic,FALSE,TRUE,50.60679481,-2.447851609

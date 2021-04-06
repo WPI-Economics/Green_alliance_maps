@@ -14,6 +14,14 @@ library(units)
 library(htmltools)
 library(readxl)
 
+sd <- sd(GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)`) #standard deviation of the data
+
+cols <- c("#adb8e6", #blue
+ "#ebc3b9",
+"#d18978",
+"#b04f3b",
+ "#8a0000")
+
 GA.raw <- read_excel("Green Alliance constituency model.xlsx", 
                      sheet = "Results (sorted)", skip = 1)
 
@@ -28,29 +36,14 @@ pcons <- readRDS("pcons.RDS")
 
 GA.2 <- merge(pcons, GA.1, by.x = "pcon19cd", by.y = "ONS code")
 
-
-
-
-# MAP IT OUT
-pallette7 <- c("#8a0000",
-               "#c98271",
-               "#f1f1f1",
-               "#cfd4ec",
-               "#adb8e6")
-
-#660a0b
-#7c2d25
-#
-#
-#
-#
-#
-#
-#
-
-#factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
-numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)`, reverse = T)
-
+#manually code colours
+sd <- sd(GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)`) #standard deviation of the data
+GA.2$cols <- NA
+GA.2$cols[GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)` < 0] <- cols[1] #adb8e6 #blue
+GA.2$cols[GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)` > 0] <- cols[2] #ebc3b9
+GA.2$cols[GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)` > sd] <- cols[3] #d18978
+GA.2$cols[GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)` > sd*2] <- cols[4] #b04f3b
+GA.2$cols[GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)` > sd*3] <- cols[5] #8a0000
 
 #this makes the hover over popup label
 #labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Take up rate: %s<sup></sup>", pc_data3$LAD20NM.x , pc_data3$Quintile, pc_data3$`Furlough rate at January 31` ) %>% lapply(htmltools::HTML)
@@ -67,27 +60,32 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
   
   addPolygons(data = GA.2, stroke = T, color = "white",
-              fillColor = ~numpal1(GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)`),
+              fillColor = ~cols,
               opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
               highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
   
   
   
-  addLegend(pal = numpal1, 
-            values = GA.2$`Underemployment change Sept 2019 - Sept 2020 (%)`,
+  addLegend(colors = cols, 
+            labels = c(
+                      paste0(round(0-sd,0)," - ",0),
+                       paste0(0," - ", round(sd,0)),
+                       paste0(round(sd,0), " - ",round(sd*2,0) ),
+                       paste0(round(sd*2,0), " - ",round(sd*3,0) ),
+                       paste0(round(sd*3,0),"+")
+                       ),
+            labFormat = labelFormat(suffix = "%%"),
             position = "topright",
             title="Underemployment change<br>
-            Sept 2019 to Sept 2020",
+            Sept 2019 to Sept 2020 (%)",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)
 
 
-plot
-
 #page element title
-title <- tags$div(HTML("Percentage change in underemployment (Sep 2019 to Sep 2020)"), 
+title <- tags$div(HTML("Percentage change in underemployment (Sept 2019 to Sept 2020)"), 
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
 
