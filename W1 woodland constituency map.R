@@ -16,27 +16,29 @@ library(htmltools)
 
 #read pcon.woodland data
 
-woodland.pcon <- read_csv("Woodland within constituencies.csv", )
+woodland.pcon <- read_csv("Woodland within constituencies.csv")
 
 #geom file
 pcons <- readRDS("pcons.RDS")
 
+
 woodland.pcon <- merge(pcons, woodland.pcon, by = 'pcon19cd')
 
-woodland.pcon <- woodland.pcon %>% mutate(Quintiles = ntile(`Woodland (%)`,5))
+woodland.pcon <- woodland.pcon %>% mutate(Quintiles = ntile(`Woodland area (ha)`,5))
+woodland.pcon$Quintiles <- factor(woodland.pcon$Quintiles, levels = c(5,4,3,2,1), labels = c("5 - High","4", "3", "2", "1 - Low"))
 
 
 # MAP IT OUT
 pallette7 <- c("#186fa9", "#518bbe","#7aa8d3", "#a2c6e9", "#c9e5ff")
 
-factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
+factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= F, na.color = "#D3D3D3") #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
 
 
 
 #this makes the hover over popup label
 #labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Take up rate: %s<sup></sup>", pc_data3$LAD20NM.x , pc_data3$Quintile, pc_data3$`Furlough rate at January 31` ) %>% lapply(htmltools::HTML)
-labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Percent woodland %s<sup>%</sup>", 
-                   woodland.pcon$pcon19nm , woodland.pcon$Quintiles, woodland.pcon$`Woodland (%)` ) %>% 
+labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Hectares of woodland: %s<sup></sup>", 
+                   woodland.pcon$pcon19nm , woodland.pcon$Quintiles, woodland.pcon$`Woodland area (ha)` ) %>% 
   lapply(htmltools::HTML)
 
 plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
@@ -55,8 +57,8 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   
   addLegend(pal = factpal1, 
             values = woodland.pcon$Quintiles,
-            position = "bottomleft",
-            title="Quintiles of % woodland in constituencies </br>5 is high, 1 low </strong>",
+            position = "topright",
+            title="Quintiles of woodland area",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)
@@ -64,8 +66,10 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
 
 plot
 
+#mapshot(plot, file =  "W1.png", remove_controls = T)
+
 #page element title
-title <- tags$div(HTML("Percentages of woodland within Westminster Parliamentary Constituencies"), 
+title <- tags$div(HTML("Total woodland within Westminster Parliamentary Constituencies"), 
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
 

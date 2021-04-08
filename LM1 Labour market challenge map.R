@@ -35,8 +35,9 @@ GA.2 <- merge(pcons, GA.1, by.x = "pcon19cd", by.y = "ONS code")
 pallette7 <- c("#8a0000",
                # "#c98271",
                 "#f1f1f1",
+               #"#E8E8E8",
                # "#cfd4ec",
-               "#adb8e6")
+               "#7784d6")
 
 
 
@@ -47,7 +48,7 @@ numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Relative labour mark
 #this makes the hover over popup label
 #labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Take up rate: %s<sup></sup>", pc_data3$LAD20NM.x , pc_data3$Quintile, pc_data3$`Furlough rate at January 31` ) %>% lapply(htmltools::HTML)
 labels1 <- sprintf("<strong>%s</strong><br/>Challenge score: %s<sup></sup><br/>", 
-                   GA.2$pcon19nm , GA.2$`Relative labour market challenge score (100 = mean average constituency)`) %>% 
+                   GA.2$pcon19nm , round(GA.2$`Relative labour market challenge score (100 = mean average constituency)`),0) %>% 
   lapply(htmltools::HTML)
 
 
@@ -78,10 +79,14 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
 plot
 
 #page element title
-title <- tags$div(HTML("Percentages of woodland within Westminster Parliamentary Constituencies"), 
+title <- tags$div(HTML("Labour market challenge scores for Westminster Constituencies"), 
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
 
-# combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
+combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
+html_print(combo)
+
+#mapshot(plot, file =  "LM1.png", remove_controls = T)
+
 # 
 # htmltools::save_html(combo, "index.html") #this saves it as an HTML page in the default folder.

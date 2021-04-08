@@ -6,6 +6,8 @@ library(sf)
 library(leaflet)
 library(leaflet.extras)
 
+`%nin%` <- Negate(`%in%`)
+
 ##Contemporary data
 sg.contemp <- read_excel("Post 1997_Contemporary.geocoded CBR .xlsx", 
                          na = "NA")
@@ -69,8 +71,89 @@ sg.corrected <- sf::st_as_sf(sg.corrected, coords = c("lon", "lat"), crs = 4326)
 
 sg.all.corrected <- bind_rows(sg.all.ok, sg.corrected)
 
+
+
 leaflet(data = sg.all.corrected) %>% 
   addTiles() %>% 
   addCircleMarkers( radius = 0.5)
+
+#saveRDS(sg.all.corrected, file = "sg.all.corrected.RDS")
+
+
+#second round of errors to clean
+
+wronguns <- c("Forth Estuary",
+              "STOUR",
+              "The Fleet",
+              "Lindisfarne",
+              "Thorpe Bay",
+              "Poole Harbour",
+              "THAMES LOWER",
+              "East Coast Scotland",
+              "Portsmouth Harbour",
+              "Sunart",
+              "North Nofolk AONB" ,
+              "Torbay",
+              "ORWELL",
+              "Scilly Isles")
+
+
+wronguns2 <- c(
+  "Blackness",
+  "stour",
+  NA,
+  "Spurn",
+  "Burgess Terrace",
+  "Newton Bay",
+  "Allhallows",
+  "Tay Estuary",
+  "St Helen's",
+"Sunart",
+"Wells",
+"Torre Abbey",
+"Orwell",
+"Scilly Isles"
+)
+
+sg.wronguns <- sg.all.corrected %>% filter(PlaceName %in% wronguns)
+sg.wronguns <- sg.wronguns %>% filter(tolower(Location) %in% tolower(wronguns2))
+
+remove <- sg.wronguns %>% filter(PlaceName == "Lindisfarne")
+sg.wronguns <- sg.wronguns %>% filter(PlaceName != "Lindisfarne")
+sg.wronguns <-  bind_rows(sg.wronguns, remove[1,])
+sg.wronguns$temp <- paste0(sg.wronguns$PlaceName, sg.wronguns$Location, sg.wronguns$Area)
+
+sg.all.corrected$temp <- paste0(sg.all.corrected$PlaceName, sg.all.corrected$Location, sg.all.corrected$Area)
+
+sg.rightuns <- sg.all.corrected %>% filter(temp %nin% sg.wronguns$temp)
+
+sg.rightuns$temp <- NULL
+sg.all.corrected$temp <- NULL
+sg.wronguns$temp <- NULL
+#write.csv(sg.wronguns, file = "wronguns.csv", row.names = F)
+
+
+sg.corrected2 <- read_csv("wronguns.csv")
+sg.corrected2 <- sg.corrected2 %>% filter(!is.na(`lat`))
+sg.corrected2 <- sf::st_as_sf(sg.corrected2, coords = c("lon", "lat"), crs = 4326)
+
+sg.all.corrected <- bind_rows(sg.rightuns, sg.corrected2)
+
+sg.all.corrected <- sg.all.corrected[,1:6]
+
+saveRDS(sg.all.corrected, file = "sg.all.corrected.RDS")
+
+
+#fix Holy island
+sg.wronguns2 <- sg.all.corrected %>% filter(Location %in% "Holy Island")
+sg.rightuns2 <- sg.all.corrected %>% filter(Location %nin% "Holy Island")
+
+write.csv(sg.wronguns2, file = "wronguns2.csv", row.names = F)
+
+sg.corrected3 <- read_csv("wronguns2.csv")
+sg.corrected3 <- sg.corrected3 %>% filter(!is.na(`lat`))
+sg.corrected3 <- sf::st_as_sf(sg.corrected3, coords = c("lon", "lat"), crs = 4326)
+
+sg.all.corrected <- bind_rows(sg.rightuns2, sg.corrected3)
 
 saveRDS(sg.all.corrected, file = "sg.all.corrected.RDS")

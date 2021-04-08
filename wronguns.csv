@@ -1,0 +1,16 @@
+PlaceName,Location,Area,Area_Ha,source,lat,lon,Found exactly,
+East Coast Scotland,Tay Estuary,Scotland,3,Contemporary,56.44577111,-3.003902932,TRUE,NA
+Forth Estuary,Blackness,Scotland,25.63,Contemporary,56.01362471,-3.529521842,TRUE,NA
+North Nofolk AONB,Wells,Norfolk,34.81840292,Contemporary,52.97763118,0.831465294,TRUE,NA
+ORWELL,Orwell,Suffolk,0.439241812,Contemporary,52.00754357,1.223974991,TRUE,NA
+Poole Harbour,Newton Bay,Dorset,0.075972071,Contemporary,50.67115585,-1.997320914,TRUE,NA
+Portsmouth Harbour,St Helen's,Hampshire and IoW,0.179478354,Contemporary,50.7077919,-1.084151395,TRUE,NA
+Scilly Isles,Scilly Isles,Scilly Isles,196,Contemporary,49.93165986,-6.283351443,TRUE,NA
+STOUR,Stour,Suffolk,0.063827567,Contemporary,51.95695098,1.153883887,TRUE,NA
+Sunart,Sunart,Scotland,0.02587983,Contemporary,56.69690538,-5.567323658,TRUE,NA
+THAMES LOWER,Allhallows,Kent,5.309220124,Contemporary,51.46961293,0.639393353,TRUE,NA
+Thorpe Bay,Burgess Terrace,Essex,2.519556489,Contemporary,51.53819838,0.760249328,TRUE,NA
+Torbay,Torre Abbey,Devon,104.367034,Contemporary,50.46306808,-3.535085231,TRUE,NA
+The Fleet,NA,Dorset,62.5,Historic,50.62665721,-2.547183735,TRUE,NA
+Lindisfarne,Spurn,Northumbria,0.59,Contemporary,55.68183367,-1.800709683,TRUE,NA
+The Fleet,The Fleet,Dorset,220,Contemporary,50.62665721,-2.547183735,TRUE,NA
