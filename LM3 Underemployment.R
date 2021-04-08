@@ -14,6 +14,12 @@ library(units)
 library(htmltools)
 library(readxl)
 
+cols <- c("#f0cfc7",
+          "#dca091",
+          "#c4725f",
+          "#a94330",
+          "#8a0000")
+
 GA.raw <- read_excel("Green Alliance constituency model.xlsx", 
                      sheet = "Results (sorted)", skip = 1)
 
@@ -31,24 +37,16 @@ GA.2 <- merge(pcons, GA.1, by.x = "pcon19cd", by.y = "ONS code")
 
 
 
-# MAP IT OUT
-# pallette7 <- c("#8a0000",
-#                "#c98271",
-#                "#f1f1f1",
-#                "#cfd4ec",
-#                "#adb8e6")
+#manually code colours
+sdval <- sd(GA.2$`Underemployment % pre-pandemic (16-64)`) #standard deviation of the data
+meanval <- mean(GA.2$`Underemployment % pre-pandemic (16-64)`) 
 
-pallette7 <- c("#8a0000",
-               "#a94330",
-               "#c4725f",
-               "#dca091",
-               "#f0cfc7",
-               "#f6f6f6")
-
-
-
-#factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
-numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Underemployment % pre-pandemic (16-64)`, reverse = T)
+GA.2$cols <- NA
+GA.2$cols[GA.2$`Underemployment % pre-pandemic (16-64)` > meanval + (sdval*1.5)] <- cols[5] #8a0000 greater than 1.5 SD from mean VERY HIGH
+GA.2$cols[GA.2$`Underemployment % pre-pandemic (16-64)` < meanval + (sdval*1.5)] <- cols[4] #b04f3b between +0.5 and +1.5 SD of mean HIGH
+GA.2$cols[GA.2$`Underemployment % pre-pandemic (16-64)` < meanval + (sdval*0.5)] <- cols[3] #d18978 between -0.5 and +0.5 SD of mean AVERAGE              
+GA.2$cols[GA.2$`Underemployment % pre-pandemic (16-64)` < meanval - (sdval*0.5)] <- cols[2] #ebc3b9 between -1.5 and -0.5 SD from mean LOW
+GA.2$cols[GA.2$`Underemployment % pre-pandemic (16-64)` < meanval - (sdval*1.5)] <- cols[1] #ebc3b9 LT -1.5 SD from mean VERY LOW
 
 
 #this makes the hover over popup label
@@ -66,18 +64,32 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
   
   addPolygons(data = GA.2, stroke = T, color = "white",
-              fillColor = ~numpal1(GA.2$`Underemployment % pre-pandemic (16-64)`),
+              fillColor = ~cols,
               opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
               highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
   
   
+  # 
+  # addLegend(className = "panel panel-default legend", 
+  #   pal = numpal1, 
+  #           bins = 5,
+  #           labFormat = labelFormat(suffix = "%"),
+  #           values = GA.2$`Underemployment % pre-pandemic (16-64)`,
+  #           position = "topright",
+  #           title="Underemployment <br>
+  #           Sept 2019 (16-64)",
+  #           opacity=1) %>%
   
-  addLegend(className = "panel panel-default legend", 
-    pal = numpal1, 
-            bins = 5,
-            labFormat = labelFormat(suffix = "%"),
-            values = GA.2$`Underemployment % pre-pandemic (16-64)`,
+  addLegend(colors = cols, 
+            labels = c(
+              "less than 5.7%",
+              "5.7% - 8.3%",
+              "8.3% - 11.0",
+              "11.0% - 13.6%",
+              "Greater than 13.6%"
+            ),
+            labFormat = labelFormat(suffix = "%%"),
             position = "topright",
             title="Underemployment <br>
             Sept 2019 (16-64)",
