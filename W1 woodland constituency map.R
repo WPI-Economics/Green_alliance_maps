@@ -13,32 +13,57 @@ library(maptools)
 library(units)
 library(htmltools)
 
-
+cols <- c("#186fa9", "#518bbe","#7aa8d3", "#a2c6e9", "#c9e5ff")
+          #"#E0E0E0")
 #read pcon.woodland data
 
 woodland.pcon <- read_csv("Woodland within constituencies.csv")
 
 #geom file
 pcons <- readRDS("pcons.RDS")
+#remove NI
+pcons <- pcons %>% filter(str_detect(pcon19cd, "N", negate = T))
 
 
-woodland.pcon <- merge(pcons, woodland.pcon, by = 'pcon19cd')
+woodland.pcon <- merge(pcons, woodland.pcon, by = 'pcon19cd', all.x = T)
+woodland.pcon$`Woodland area (ha)`[is.na(woodland.pcon$`Woodland area (ha)`)] <- 0 #make na values 0
 
-woodland.pcon <- woodland.pcon %>% mutate(Quintiles = ntile(`Woodland area (ha)`,5))
-woodland.pcon$Quintiles <- factor(woodland.pcon$Quintiles, levels = c(5,4,3,2,1), labels = c("5 - High","4", "3", "2", "1 - Low"))
+woodland.pcon <- woodland.pcon %>% arrange(`Woodland area (ha)`)
+woodland.pcon <- woodland.pcon %>% mutate(cumsum_ha = cumsum(`Woodland area (ha)`)) #cumulative sum of hectares of woodland
+woodland.pcon <- woodland.pcon %>% arrange(`Woodland area (ha)`)
+woodland.pcon <- woodland.pcon %>% mutate(cumsum_pc = cumsum((`Woodland area (ha)`/sum(`Woodland area (ha)`)*100)))  #cumulative sum of hectares of woodland as percentage
+
+woodland.pcon$`Cumulative % share of woodland` <- NA
+woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc >80] <- 1
+woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 80] <-2 
+woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 60] <- 3
+woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 40] <- 4
+woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 20] <- 5
+woodland.pcon$`Cumulative % share of woodland` <- factor(woodland.pcon$`Cumulative % share of woodland`,levels = c(1:5),
+                                                         labels = 
+                                                           c("Most concentrated cumulative 20% of all woodland",
+                                                             "60-80",
+                                                             "40-60",
+                                                             "20-40",
+                                                             "Least concentrated cumulative 20% of all woodland"))
+
+
 
 
 # MAP IT OUT
-pallette7 <- c("#186fa9", "#518bbe","#7aa8d3", "#a2c6e9", "#c9e5ff")
+#pallette7 <- c("#186fa9", "#518bbe","#7aa8d3", "#a2c6e9", "#c9e5ff")
 
-factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= F, na.color = "#D3D3D3") #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
+factpal1 <- colorFactor(cols, domain = woodland.pcon$`Cumulative % share of woodland`, reverse= F) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
 
 
 
 #this makes the hover over popup label
 #labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Take up rate: %s<sup></sup>", pc_data3$LAD20NM.x , pc_data3$Quintile, pc_data3$`Furlough rate at January 31` ) %>% lapply(htmltools::HTML)
-labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Hectares of woodland: %s<sup></sup>", 
-                   woodland.pcon$pcon19nm , woodland.pcon$Quintiles, woodland.pcon$`Woodland area (ha)` ) %>% 
+labels1 <- sprintf("<strong>%s</strong><br/>%s<sup></sup><br/>Hectares of woodland: %s<sup></sup>", 
+                   woodland.pcon$pcon19nm , 
+                   woodland.pcon$`Cumulative % share of woodland`, 
+                   format(round(woodland.pcon$`Woodland area (ha)`,0),big.mark = ",")
+                   ) %>% 
   lapply(htmltools::HTML)
 
 plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
@@ -49,22 +74,22 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
   
   addPolygons(data = woodland.pcon, stroke = T, color = "white",
-              fillColor = ~factpal1(woodland.pcon$Quintiles),opacity = 1, 
+              fillColor = ~factpal1(woodland.pcon$`Cumulative % share of woodland`),opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
               highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
   
   
   
   addLegend(pal = factpal1, 
-            values = woodland.pcon$Quintiles,
+            values = woodland.pcon$`Cumulative % share of woodland`,
             position = "topright",
-            title="Quintiles of woodland area",
+            title="Distribution of woodland area",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)
 
 
-plot
+#plot
 
 #mapshot(plot, file =  "W1.png", remove_controls = T)
 

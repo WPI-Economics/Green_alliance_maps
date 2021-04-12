@@ -14,6 +14,13 @@ library(units)
 library(htmltools)
 library(readxl)
 
+
+cols <- c("#8a0000",
+         "#c98271",
+          "#E0E0E0",
+          "#adb8e6",
+          "#7081e4")
+
 GA.raw <- read_excel("Green Alliance constituency model.xlsx", 
                      sheet = "Results (sorted)", skip = 1)
 
@@ -28,14 +35,47 @@ pcons <- readRDS("pcons.RDS")
 GA.2 <- merge(pcons, GA.1, by.x = "pcon19cd", by.y = "ONS code")
 GA.2$`Forecast percentage change in employments 2019-2025` <- round(GA.2$`Forecast percentage change in employments 2019-2025`*100,1)
 
+meanval <- mean(GA.2$`Forecast percentage change in employments 2019-2025`)
+sdval <- sd(GA.2$`Forecast percentage change in employments 2019-2025`)
+
+GA.2$cols <- NA
+GA.2$cols[GA.2$`Forecast percentage change in employments 2019-2025` > meanval + (sdval*1.5)] <- cols[5] #8a0000 greater than 1.5 SD from mean VERY HIGH
+GA.2$cols[GA.2$`Forecast percentage change in employments 2019-2025` <= meanval + (sdval*1.5)] <- cols[4] #b04f3b between +0.5 and +1.5 SD of mean HIGH
+GA.2$cols[GA.2$`Forecast percentage change in employments 2019-2025` <= meanval + (sdval*0.5)] <- cols[3] #d18978 between -0.5 and +0.5 SD of mean AVERAGE              
+GA.2$cols[GA.2$`Forecast percentage change in employments 2019-2025` <= meanval - (sdval*0.5)] <- cols[2] #ebc3b9 between -1.5 and -0.5 SD from mean LOW
+GA.2$cols[GA.2$`Forecast percentage change in employments 2019-2025` <= meanval - (sdval*1.5)] <- cols[1] #ebc3b9 LT -1.5 SD from mean VERY LOW
+
+#written long
+very.high <- paste0("Greater than ",round(meanval + (sdval*1.5),1))
+high <- paste0("Greater than ",round(meanval + (sdval*0.5),1) , " and less than ",round(meanval + (sdval*1.5),1)   )
+average <- paste0("Greater than ",round(meanval - (sdval*0.5),1) , " and less than ",round(meanval + (sdval*0.5),1)  )
+low <- paste0("Greater than ", round(meanval - (sdval*1.5),1), " and less than ", round(meanval - (sdval*0.5),1)  )
+very.low <- paste0("Less than ", round(meanval - (sdval*1.5) ,1))
+
+long.cats <- c(very.high, high, average, very.low, low)
+
+#condensed
+very.high.sht <- paste0("> ",round(meanval + (sdval*1.5),1))
+high.sht <- paste0("> ",round(meanval + (sdval*0.5),1) , " <= ",round(meanval + (sdval*1.5),1)   )
+average.sht <- paste0("> ",round(meanval - (sdval*0.5),1) , " <= ",round(meanval + (sdval*0.5),1)  )
+low.sht <- paste0("> ", round(meanval - (sdval*1.5),1), " <= ", round(meanval - (sdval*0.5),1)  )
+very.low.sht <- paste0("<= ", round(meanval - (sdval*1.5) ,1))
+
+short.cats <- c(very.high.sht, high.sht, average.sht, low.sht,very.low.sht)
 
 
-# MAP IT OUT
-pallette7 <- c("#8a0000",
-  "#c98271",
-  "#f1f1f1",
-  "#cfd4ec",
-  "#adb8e6")
+
+
+
+
+
+
+# # MAP IT OUT
+# pallette7 <- c("#8a0000",
+#   "#c98271",
+#   "#f1f1f1",
+#   "#cfd4ec",
+#   "#adb8e6")
 
 #660a0b
 #7c2d25
@@ -48,12 +88,12 @@ pallette7 <- c("#8a0000",
 #
 
 #factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
-numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Forecast percentage change in employments 2019-2025`, reverse = F)
+#numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Forecast percentage change in employments 2019-2025`, reverse = F)
 
 
 #this makes the hover over popup label
 #labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Take up rate: %s<sup></sup>", pc_data3$LAD20NM.x , pc_data3$Quintile, pc_data3$`Furlough rate at January 31` ) %>% lapply(htmltools::HTML)
-labels1 <- sprintf("<strong>%s</strong><br/>Forcast change in employment %s<sup></sup><br/>", 
+labels1 <- sprintf("<strong>%s</strong><br/>Forcast change in employment %s%%<sup></sup><br/>", 
                    GA.2$pcon19nm , GA.2$`Forecast percentage change in employments 2019-2025`) %>% 
   lapply(htmltools::HTML)
 
@@ -66,15 +106,21 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
   
   addPolygons(data = GA.2, stroke = T, color = "white",
-              fillColor = ~numpal1(GA.2$`Forecast percentage change in employments 2019-2025`),
+              fillColor = ~cols,
               opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
               highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
   
   
   
-  addLegend(pal = numpal1, 
-            values = GA.2$`Forecast percentage change in employments 2019-2025`,
+  addLegend(colors = rev(cols), 
+            labels = c(
+              paste0("Very high (", very.high.sht,")"), 
+              paste0("High (",high.sht,")"), 
+              paste0("Average (",average.sht,")"), 
+              paste0("Low (", low.sht,")"),
+              paste0("Very low (",very.low.sht,")")
+            ),
             position = "topright",
             title="Forcast change <br>in employments (%)",
             opacity=1) %>%
