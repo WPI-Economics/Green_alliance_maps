@@ -4,12 +4,34 @@ code_folding: "hide"
 always_allow_html: yes
 ---
 
-```{r PLOT, echo=FALSE, warning=F, message=F, width = 800, height = 700}
+```{r PLOT, echo=FALSE, warning=F, message=F, height = 1600, width = 1000}
 source(paste0(i,".R"), echo = FALSE)
+
+browsable(
+  tagList(
+    list(
+      tags$head(
+        tags$style(
+          ".leaflet .legend {
+                 line-height: 30px;
+                 font-size: 30px;
+                 }",
+          ".leaflet .legend i{
+                width: 30px;
+                height: 30px;
+                 }"
+        )
+      ),
+      plot)))
+
+```
+
+```{r MAPSHOT, echo=FALSE, warning=F, message=F, width = 800, height = 700}
+#source(paste0(i,".R"), echo = FALSE)
 
 #plot %>% leaflet(options = leafletOptions(zoomControl = F))
 
 #mapshot(plot, file =  paste0("Maps/",gsub(".*/","",i),".pdf"), remove_controls = T)
-mapshot(plot, file =  paste0("Maps/",gsub(".*/","",i),".png"), remove_controls = T, vheight = 1333, vwidth = 1000)
+#mapshot(x, file =  paste0("Maps/",gsub(".*/","",i),".png"), remove_controls = T, vheight = 1333, vwidth = 1000)
 
 ```

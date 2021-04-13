@@ -48,20 +48,20 @@ GA.2$cols[GA.2$`Relative labour market challenge score (100 = mean average const
 GA.2$cols[GA.2$`Relative labour market challenge score (100 = mean average constituency)` <= meanval - (sdval*1.5)] <- cols[5] #ebc3b9 LT -1.5 SD from mean VERY LOW
 
 #written long
-very.high <- paste0("Greater than ",round(meanval + (sdval*1.5),1))
-high <- paste0("Greater than ",round(meanval + (sdval*0.5),1) , " and less than ",round(meanval + (sdval*1.5),1)   )
-average <- paste0("Greater than ",round(meanval - (sdval*0.5),1) , " and less than ",round(meanval + (sdval*0.5),1)  )
-low <- paste0("Greater than ", round(meanval - (sdval*1.5),1), " and less than ", round(meanval - (sdval*0.5),1)  )
-very.low <- paste0("Less than ", round(meanval - (sdval*1.5) ,1))
+very.high <- paste0("Greater than ",round(meanval + (sdval*1.5),0))
+high <- paste0("Greater than ",round(meanval + (sdval*0.5),0) , " and less than ",round(meanval + (sdval*1.5),0)   )
+average <- paste0("Greater than ",round(meanval - (sdval*0.5),0) , " and less than ",round(meanval + (sdval*0.5),0)  )
+low <- paste0("Greater than ", round(meanval - (sdval*1.5),0), " and less than ", round(meanval - (sdval*0.5),0)  )
+very.low <- paste0("Less than ", round(meanval - (sdval*1.5) ,0))
 
 long.cats <- c(very.high, high, average, very.low, low)
 
 #condensed
-very.high.sht <- paste0("> ",round(meanval + (sdval*1.5),1))
-high.sht <- paste0("> ",round(meanval + (sdval*0.5),1) , " <= ",round(meanval + (sdval*1.5),1)   )
-average.sht <- paste0("> ",round(meanval - (sdval*0.5),1) , " <= ",round(meanval + (sdval*0.5),1)  )
-low.sht <- paste0("> ", round(meanval - (sdval*1.5),1), " <= ", round(meanval - (sdval*0.5),1)  )
-very.low.sht <- paste0("<= ", round(meanval - (sdval*1.5) ,1))
+very.high.sht <- paste0("> ",round(meanval + (sdval*1.5),0))
+high.sht <- paste0("> ",round(meanval + (sdval*0.5),0) , " <= ",round(meanval + (sdval*1.5),0)   )
+average.sht <- paste0("> ",round(meanval - (sdval*0.5),0) , " <= ",round(meanval + (sdval*0.5),0)  )
+low.sht <- paste0("> ", round(meanval - (sdval*1.5),0), " <= ", round(meanval - (sdval*0.5),0)  )
+very.low.sht <- paste0("<= ", round(meanval - (sdval*1.5) ,0))
 
 short.cats <- c(very.high.sht, high.sht, average.sht, very.low.sht, low.sht)
 
@@ -88,7 +88,20 @@ labels1 <- sprintf("<strong>%s</strong><br/>Challenge score: %s<sup></sup><br/>"
   lapply(htmltools::HTML)
 
 
-plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
+plot <- tags$head(
+        tags$style(
+          ".leaflet .legend {
+                 line-height: 30px;
+                 font-size: 30px;
+                 }",
+          ".leaflet .legend i{
+                width: 30px;
+                height: 30px;
+                 }"
+        ))
+
+
+plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = F)) %>%
   setView(lng =  -3.13,
           lat = 54.8,zoom = 6.8) %>% #setView gives centre coordinates and zoom level
   
@@ -119,6 +132,8 @@ plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 
 
 
 plot
+
+
 
 #page element title
 title <- tags$div(HTML("Labour market challenge scores for Westminster Constituencies"), 

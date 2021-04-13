@@ -47,19 +47,26 @@ woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 20] <-
 
 woodland.pcon$`Cumulative % share of woodland` <- factor(woodland.pcon$`Cumulative % share of woodland`,levels = c(1:5))
 
-breaks <- woodland.pcon %>% st_drop_geometry() %>%  group_by(`Cumulative % share of woodland`) %>% summarise(min = min(cumsum_ha), max = max(cumsum_ha), npcons = n())
-breaks[,c(2:3)] <- lapply(breaks[,c(2:3)], function(x){round(x,0)} )
-breaks[,c(2:3)] <- lapply(breaks[,c(2:3)], function(x){format(x, big.mark = ",", digits = 4)} )
+breaks <- woodland.pcon %>% st_drop_geometry() %>%  group_by(`Cumulative % share of woodland`) %>% summarise(min = min(cumsum_ha), 
+                                                                                                             max = max(cumsum_ha), 
+                                                                                                             min.ha = min(`Woodland area (ha)`), 
+                                                                                                             max.ha = max(`Woodland area (ha)`),
+                                                                                                             npcons = n())
+breaks[,c(2:6)] <- lapply(breaks[,c(2:6)], function(x){round(x,-2)} )
+breaks[,c(2:6)] <- lapply(breaks[,c(2:6)], function(x){format(x,big.mark = ",")} )
 
+
+breaks2 <- woodland.pcon %>% st_drop_geometry() %>%  group_by(`Cumulative % share of woodland`) %>% 
+  summarise(min.ha = min(`Woodland area (ha)`), max.ha = max(`Woodland area (ha)`), npcons = n())
 
 woodland.pcon$`Cumulative % share of woodland` <- factor(woodland.pcon$`Cumulative % share of woodland`,levels = c(1:5),
                                                          labels = 
                                                            c(
-                                                             paste0("Very high (",breaks$min[1], " to ",breaks$max[1],")" ),
-                                                             paste0("High (",breaks$min[2], " to ",breaks$max[2],")") ,
-                                                             paste0("Mid (",breaks$min[3], " to ",breaks$max[3],")") ,
-                                                         paste0("Low (",breaks$min[4], " to ",breaks$max[4],")") ,
-                                                            paste0("Very low (",breaks$min[5], " to ",breaks$max[5],")") 
+                                                             paste0("Very high (",breaks$min.ha[1], " to ",breaks$max.ha[1],")" ),
+                                                             paste0("High (",breaks$min.ha[2], " to ",breaks$max.ha[2],")") ,
+                                                             paste0("Mid (",breaks$min.ha[3], " to ",breaks$max.ha[3],")") ,
+                                                         paste0("Low (",breaks$min.ha[4], " to ",breaks$max.ha[4],")") ,
+                                                            paste0("Very low (",breaks$min.ha[5], " to ",breaks$max.ha[5],")") 
 ))
 
 
@@ -80,7 +87,7 @@ labels1 <- sprintf("<strong>%s</strong><br/>%s<sup></sup><br/>Hectares of woodla
                    ) %>% 
   lapply(htmltools::HTML)
 
-plot <- leaflet(height = 1600, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
+plot <- leaflet(height = 1600, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = F)) %>%
   setView(lng =  -3.13,
           lat = 54.8,zoom = 6.8) %>% #setView gives centre coordinates and zoom level
   
@@ -98,7 +105,7 @@ plot <- leaflet(height = 1600, options= leafletOptions(padding = 100, zoomSnap =
   addLegend(pal = factpal1, 
             values = woodland.pcon$`Cumulative % share of woodland`,
             position = "topright",
-            title="Woodland opportunity groups",
+            title="Woodland opportunity groups <br> (hectares per constituency)",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)

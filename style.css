@@ -1,0 +1,13 @@
+/*COMMENTS*/
+
+.leaflet .legend {
+                 line-height: 30px;
+                 font-size: 30px;
+}
+
+.leaflet .legend i{
+                width: 30px;
+                height: 30px;
+  
+}
+                 

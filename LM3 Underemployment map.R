@@ -60,7 +60,7 @@ labels1 <- sprintf("<strong>%s</strong><br/>Underemployment pre-pandemic (16-64)
   lapply(htmltools::HTML)
 
 
-plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
+plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = F)) %>%
   setView(lng =  -3.13,
           lat = 54.8,zoom = 6.8)  %>% #setView gives centre coordinates and zoom level
   
