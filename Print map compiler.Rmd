@@ -9,7 +9,7 @@ source(paste0(i,".R"), echo = FALSE)
 
 #plot %>% leaflet(options = leafletOptions(zoomControl = F))
 
-mapshot(plot, file =  paste0("Maps/",gsub(".*/","",i),".pdf"), remove_controls = T)
-
+#mapshot(plot, file =  paste0("Maps/",gsub(".*/","",i),".pdf"), remove_controls = T)
+mapshot(plot, file =  paste0("Maps/",gsub(".*/","",i),".png"), remove_controls = T, vheight = 1333, vwidth = 1000)
 
 ```

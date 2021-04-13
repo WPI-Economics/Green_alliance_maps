@@ -88,6 +88,10 @@ Gen <- "https://opendata.arcgis.com/datasets/937997590f724a398ccc0100dbd9feee_0.
 #saveRDS(pcons, file = "pcons.RDS")
 pcons <- readRDS("pcons.RDS")
 
+pcons <- st_transform(pcons, 27700)
+pcons <- rmapshaper::ms_simplify(pcons, keep = 0.2)
+pcons <- st_transform(pcons, 4326)
+
 
 p <- as(pcons, 'Spatial')
 w <- as_Spatial(woodland.union)

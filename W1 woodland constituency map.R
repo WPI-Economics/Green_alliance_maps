@@ -39,14 +39,28 @@ woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 80] <-
 woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 60] <- 3
 woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 40] <- 4
 woodland.pcon$`Cumulative % share of woodland`[woodland.pcon$cumsum_pc <= 20] <- 5
+
+#breaks in hectares
+
+
+
+
+woodland.pcon$`Cumulative % share of woodland` <- factor(woodland.pcon$`Cumulative % share of woodland`,levels = c(1:5))
+
+breaks <- woodland.pcon %>% st_drop_geometry() %>%  group_by(`Cumulative % share of woodland`) %>% summarise(min = min(cumsum_ha), max = max(cumsum_ha), npcons = n())
+breaks[,c(2:3)] <- lapply(breaks[,c(2:3)], function(x){round(x,0)} )
+breaks[,c(2:3)] <- lapply(breaks[,c(2:3)], function(x){format(x, big.mark = ",", digits = 4)} )
+
+
 woodland.pcon$`Cumulative % share of woodland` <- factor(woodland.pcon$`Cumulative % share of woodland`,levels = c(1:5),
                                                          labels = 
-                                                           c("Most concentrated cumulative 20% of all woodland",
-                                                             "60-80",
-                                                             "40-60",
-                                                             "20-40",
-                                                             "Least concentrated cumulative 20% of all woodland"))
-
+                                                           c(
+                                                             paste0("Very high (",breaks$min[1], " to ",breaks$max[1],")" ),
+                                                             paste0("High (",breaks$min[2], " to ",breaks$max[2],")") ,
+                                                             paste0("Mid (",breaks$min[3], " to ",breaks$max[3],")") ,
+                                                         paste0("Low (",breaks$min[4], " to ",breaks$max[4],")") ,
+                                                            paste0("Very low (",breaks$min[5], " to ",breaks$max[5],")") 
+))
 
 
 
@@ -66,15 +80,16 @@ labels1 <- sprintf("<strong>%s</strong><br/>%s<sup></sup><br/>Hectares of woodla
                    ) %>% 
   lapply(htmltools::HTML)
 
-plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
+plot <- leaflet(height = 1600, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
   setView(lng =  -3.13,
-          lat = 54.90,zoom = 6) %>% #setView gives centre coordinates and zoom level
+          lat = 54.8,zoom = 6.8) %>% #setView gives centre coordinates and zoom level
   
   setMapWidgetStyle(list(background = "white")) %>%
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
   
   addPolygons(data = woodland.pcon, stroke = T, color = "white",
-              fillColor = ~factpal1(woodland.pcon$`Cumulative % share of woodland`),opacity = 1, 
+              fillColor = ~factpal1(woodland.pcon$`Cumulative % share of woodland`),
+              opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
               highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
   
@@ -83,21 +98,26 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   addLegend(pal = factpal1, 
             values = woodland.pcon$`Cumulative % share of woodland`,
             position = "topright",
-            title="Distribution of woodland area",
+            title="Woodland opportunity groups",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)
 
 
-#plot
+plot
 
 #mapshot(plot, file =  "W1.png", remove_controls = T)
 
 #page element title
-title <- tags$div(HTML("Total woodland within Westminster Parliamentary Constituencies"), 
+title <- tags$div(HTML("Woodland opportunity within Westminster Parliamentary Constituencies"), 
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
 
 combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
 
-htmltools::save_html(combo, "index.html") #this saves it as an HTML page in the default folder.
+html_print(combo)
+
+#htmltools::save_html(combo, "index.html") #this saves it as an HTML page in the default folder.
+
+
+

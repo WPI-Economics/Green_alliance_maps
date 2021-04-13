@@ -28,7 +28,13 @@ GA.1 <- GA.raw[,c(1,2,18,9)]
 
 
 #geom file
+#reduce points to make files smaller and tidier.
 pcons <- readRDS("pcons.RDS")
+
+pcons <- st_transform(pcons, 27700)
+pcons <- rmapshaper::ms_simplify(pcons, keep = 0.2)
+pcons <- st_transform(pcons, 4326)
+# saveRDS(pcons, "pcons.RDS")
 
 GA.2 <- merge(pcons, GA.1, by.x = "pcon19cd", by.y = "ONS code")
 meanval <- mean(GA.1$`Relative labour market challenge score (100 = mean average constituency)`)
@@ -82,9 +88,9 @@ labels1 <- sprintf("<strong>%s</strong><br/>Challenge score: %s<sup></sup><br/>"
   lapply(htmltools::HTML)
 
 
-plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
+plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3)) %>%
   setView(lng =  -3.13,
-          lat = 54.90,zoom = 6) %>% #setView gives centre coordinates and zoom level
+          lat = 54.8,zoom = 6.8) %>% #setView gives centre coordinates and zoom level
   
   setMapWidgetStyle(list(background = "white")) %>%
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
@@ -112,7 +118,7 @@ plot <- leaflet(height = "800px",options= leafletOptions(padding = 100, zoomSnap
   removeDrawToolbar(clearFeatures = T)
 
 
-#plot
+plot
 
 #page element title
 title <- tags$div(HTML("Labour market challenge scores for Westminster Constituencies"), 
