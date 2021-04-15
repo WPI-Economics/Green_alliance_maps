@@ -93,8 +93,6 @@ title <- tags$div(HTML("Percentage change in underemployment (Sept 2019 to Sept 
                   style = "font-family: Open Sans;color: #2A2A2A;font-weight: bold; font-size: 18px; text-align: center"
 )
 
-mapshot(plot, file =  "LM4.png", remove_controls = T)
-
 combo <- htmltools::tagList(title, plot) #I think this makes a combined html object
 html_print(combo)
 # 

@@ -9,8 +9,6 @@ library(geojsonsf)
 library(rmapshaper)
 library(sf)
 
-bog.coords <- read_csv("Bog NSEW coords.csv")
-
 # aonb <- geojson_sf("https://opendata.arcgis.com/datasets/6f2ad07d91304ad79cdecd52489d5046_0.geojson")
 # ons.national.parks <- geojson_sf("https://opendata.arcgis.com/datasets/6ed787ab793c449b9e036bf88f6e55b0_0.geojson")
 # 
@@ -42,6 +40,7 @@ colnames(t2) <- c("NAME", "geometry")
 
 all <- bind_rows(t1, t2)
 all <- bind_rows(all, s.pennines)
+#saveRDS(all, "Great north bog areas.RDS")
 
 all <- st_union(all,by_feature = F )
 
@@ -57,6 +56,8 @@ pcons.bog <- pcons %>% filter(near.bog == T)
 
 leaflet() %>% addTiles() %>%
   addPolygons(data = pcons.bog, fillOpacity = 0.3, opacity = 1, weight = 0.2, fillColor = "red",color = "#E0E0E0")
+
+#saveRDS(pcons.bog, file = "pcons.GN.bog.rds")
 
 pcons.bog.df <- pcons[,c(1,2,11)]
 pcons.bog.df <- st_drop_geometry(pcons.bog.df)

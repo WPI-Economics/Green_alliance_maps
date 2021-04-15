@@ -14,6 +14,23 @@ library(units)
 library(htmltools)
 library(readxl)
 
+
+#function for adding circle sizes to the legend
+addLegendCustom <- function(map, colors, labels, sizes, opacity = 1, position){
+  
+  colorAdditions <- paste0(colors, "; border-radius: 60%; width:", sizes, "px; height:",
+                           sizes, "px", "; position: relative; left: ",max(sizes)-(sizes/2)-5,"px"
+                           ,";margin-top: 7px;line-height: ", sizes, "px;'>")
+  
+  labelAdditions <- paste0("<div style='display: inline-block;height: ", 
+                           sizes,";position:relative; left: ",max(sizes)-(sizes),"px","; bottom: ",
+                           5,"px",";margin-top: 12px;line-height: ", sizes, "px;'>", 
+                           labels, "</div>")
+  
+  return(addLegend(map, colors = colorAdditions, 
+                   labels = labelAdditions, opacity = opacity, position = position))
+}
+
 cols <- c("#f0cfc7",
           "#dca091",
           "#c4725f",
@@ -65,24 +82,15 @@ very.low.sht <- paste0("<= ", round(meanval - (sdval*1.5) ,0))
 
 short.cats <- c(very.high.sht, high.sht, average.sht, very.low.sht, low.sht)
 
-# MAP IT OUT
-#pallette7 <- c("#660a0b", "#7c2d25","#924a40", "#a6675d", "#b9847b","#cca29a", "#dec0bb","#efdfdc", "#ffffff")
 
-# pallette7 <- c("#8a0000",
-#                # "#c98271",
-#                 "#f1f1f1",
-#                #"#E8E8E8",
-#                # "#cfd4ec",
-#                "#7784d6")
-
-
-
-#factpal1 <- colorFactor(pallette7, domain = woodland.pcon$Quintiles, reverse= TRUE) #"Set3 is a colorbrewer preset https://www.r-graph-gallery.com/38-rcolorbrewers-palettes.html
-#numpal1 <- colorNumeric(palette = pallette7, domain = GA.2$`Relative labour market challenge score (100 = mean average constituency)`, reverse = T)
+#Seagrass locations
+sg.all.corrected <- readRDS(file = "sg.all.corrected.RDS")
+sg.all.corrected <- sg.all.corrected %>% filter(!(PlaceName == "The Fleet" & source == "Contemporary")) #remove broken entry for The Fleet
+#remove NI
+sg.all.corrected <- sg.all.corrected %>% filter(Area != "Northern Ireland")
 
 
 #this makes the hover over popup label
-#labels1 <- sprintf("<strong>%s</strong><br/>Quintile: %s<sup></sup><br/>Take up rate: %s<sup></sup>", pc_data3$LAD20NM.x , pc_data3$Quintile, pc_data3$`Furlough rate at January 31` ) %>% lapply(htmltools::HTML)
 labels1 <- sprintf("<strong>%s</strong><br/>Challenge score: %s<sup></sup><br/>", 
                    GA.2$pcon19nm , round(GA.2$`Relative labour market challenge score (100 = mean average constituency)`),0) %>% 
   lapply(htmltools::HTML)
@@ -112,7 +120,8 @@ plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 
               fillColor = ~cols,
               opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
-              highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
+              #highlight= highlightOptions(color="white", weight=2, bringToFront= T)
+              )  %>%
   
   
   
@@ -126,7 +135,20 @@ plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 
               ),
             position = "topright",
             title="Labour market challenge score",
-            opacity=1) %>%
+            opacity=1) %>% 
+  
+  addCircleMarkers(data = sg.all.corrected,
+                   color = "#315C73",
+                   opacity = 1,
+                   fillOpacity = 1,
+                   radius = 3, 
+                   weight = 1.5,
+                   popup = paste0(sg.all.corrected$PlaceName,"<br>",sg.all.corrected$`Location`)) %>% 
+  
+  addLegendCustom(colors = c("#315C73"), 
+                  labels = c("Seagrass locations"),
+                  
+                  sizes = c(10), position = "topright" ) %>% 
   
   removeDrawToolbar(clearFeatures = T)
 
@@ -147,3 +169,5 @@ html_print(combo)
 
 # 
 # htmltools::save_html(combo, "index.html") #this saves it as an HTML page in the default folder.
+
+#saveRDS(GA.2, file = "LMChallenge.sf.RDS")

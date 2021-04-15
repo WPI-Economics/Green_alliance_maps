@@ -126,7 +126,7 @@ plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 
               paste0("Very low (",very.low.sht,")")
             ),
             position = "topright",
-            title="Forcast change <br>in employments (%)",
+            title="Forecast change <br>in employments (%)",
             opacity=1) %>%
   
   removeDrawToolbar(clearFeatures = T)
