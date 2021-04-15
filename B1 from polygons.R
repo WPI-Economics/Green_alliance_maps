@@ -49,7 +49,7 @@ all <- st_union(all,by_feature = F )
 pcons <- readRDS('pcons.RDS')
 pcons <- st_transform(pcons, 27700)
 
-pcons$near.bog <- st_is_within_distance(pcons, all, dist = 0.363, sparse = F) # 1 degree is 55.051 miles so 20 miles is 0.363 degrees
+pcons$near.bog <- st_is_within_distance(pcons, all, dist = 0.1815, sparse = F) # 1 degree is 55.051 miles so 20 miles is 0.363 degrees, 10 miles 0.1815
 
 pcons <- st_transform(pcons, 4326)
 
@@ -61,6 +61,6 @@ leaflet() %>% addTiles() %>%
 pcons.bog.df <- pcons[,c(1,2,11)]
 pcons.bog.df <- st_drop_geometry(pcons.bog.df)
 
-write.csv(pcons.bog.df, file = "Constituencies near bog.csv")
+write.csv(pcons.bog.df, file = "Constituencies 10 miles from bog.csv")
 
 
