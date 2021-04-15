@@ -28,3 +28,5 @@ vignettes/*.pdf
 .Renviron
 .DS_Store
 w.sp.RDS
+
+/Woodland_opportunity_mineral.gdb/
