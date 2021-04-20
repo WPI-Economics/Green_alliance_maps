@@ -69,7 +69,7 @@ woodland.pcon$`Cumulative % share of woodland` <- factor(woodland.pcon$`Cumulati
                                                             paste0("Very low (",breaks$min.ha[5], " to ",breaks$max.ha[5],")") 
 ))
 
-
+saveRDS(woodland.pcon, file = "Woodland.pcon.summary.RDS")
 
 # MAP IT OUT
 #pallette7 <- c("#186fa9", "#518bbe","#7aa8d3", "#a2c6e9", "#c9e5ff")

@@ -1,0 +1,78 @@
+---
+title: "Gapminder data using crosstalk"
+output:
+flexdashboard::flex_dashboard:
+orientation: rows
+theme: lumen
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard) ; library(crosstalk) ; library(dplyr) ; library(rgdal)
+## This is the site works and where I have modified code from: http://rstudio-pubs-static.s3.amazonaws.com/209203_02f14fea3274448bbbf8d04c99c6051b.html
+## These are the steps for creating (and writing) the SpatialPolygonsDataFrame using data from the gapminder package and the boundary vector layer supplied by www.naturalearthdata.com in the rworldmap package.
+library(gapminder) ; library(countrycode)
+df <- gapminder %>% filter(year == 2007) %>% mutate(ISO3 = countrycode(country, "country.name", "iso3c"), gdpPercap = round(gdpPercap, 0), lifeExp = round(lifeExp, 0))
+# This removes a duplicate ISO3 ref (KOR) - save for a more robust solution. 
+df<- df %>% filter(country != "Korea, Dem. Rep.")
+###
+### ### Run this code chunk for the first time
+library(rworldmap) ; library(spatialEco)
+data(countriesLow)
+world <- countriesLow
+world <- sp::merge(world, df, by.x = "ISO3", by.y = "ISO3", sort = FALSE)
+world <- world[, c("country", "continent.y",  "year", "lifeExp", "pop", "gdpPercap")] 
+world_NA <- world[is.na(world@data$country) ,]
+writeOGR(world_NA, ".", "world_NA",overwrite_layer=TRUE ,driver="ESRI Shapefile")
+world <- sp.na.omit(world, col.name = "country")
+writeOGR(world, ".", "world",overwrite_layer=TRUE ,driver="ESRI Shapefile")
+### ### 
+world <- readOGR(".", "world", verbose = FALSE)
+world@data <- rename(world@data, continent = cntnnt_)
+world_NA <- readOGR(".", "world_NA", verbose = FALSE)
+sd <- SharedData$new(world)
+#Added this to allow sharedDate to work ()
+sd_df <- SharedData$new(world@data, group = sd$groupName())
+```
+
+Inputs {.sidebar}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+#sd$transform(as.data.frame) does not work?  (throughout the replaced sd with sd_df)
+filter_slider("lifeExp", "Life expectancy (years)", sd_df, ~lifeExp)
+filter_slider("gdpPrcp", "Income per person ($)", sd_df, ~gdpPrcp)
+```
+
+Row {data-height=550}
+-------------------------------------
+
+### Chart B
+
+```{r}
+library(leaflet)
+pal <- colorFactor(c("#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"), domain = c("Africa", "Americas", "Asia", "Europe", "Oceania"), ordered = FALSE)
+leaflet(sd_df) %>% 
+setView(9.998176, 14.531777, zoom = 2) %>%
+addProviderTiles("CartoDB.Positron") %>% 
+addPolygons(data = world_NA, color = "#969696", weight = 1, fillColor = "#808080") %>% 
+addPolygons(data = world, color = "#969696", weight = 2, fillColor = ~pal(continent), fillOpacity = 0.8, label = ~as.character(country))
+```
+Row {data-height=450}
+-------------------------------------
+
+###
+
+```{r}
+library(d3scatter)
+d3scatter(sd_df, x = ~gdpPrcp, y = ~lifeExp, color = ~continent, x_label = "Income per person", y_label = "Life expectancy")
+```
+
+###
+
+```{r}
+library(DT)
+datatable(sd_df, rownames = FALSE, extensions = 'Scroller', 
+          options = list(scrollY = 200, scroller = TRUE, columnDefs = list(list(className = 'dt-left', targets = 0:3))))
+```

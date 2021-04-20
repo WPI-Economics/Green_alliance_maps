@@ -22,6 +22,12 @@ pcons.near.bog <- readRDS(file = "pcons.GN.bog.rds")
 lmchallenge <- readRDS(file = "LMChallenge.sf.RDS")
 lmchallenge <- st_drop_geometry(lmchallenge)
 
+uk.bounds <- geojson_sf("https://opendata.arcgis.com/datasets/01fd6b2d7600446d8af768005992f76a_0.geojson")
+uk.bounds <- ms_simplify(uk.bounds, keep = 0.05)
+uk.bounds <- uk.bounds %>% filter(nuts118nm != "Northern Ireland")
+uk.bounds <- st_transform(uk.bounds, 4326)
+uk.bounds <- st_union(uk.bounds)
+
 
 #merge LM challenge scores into bog pcons.
 
@@ -43,14 +49,20 @@ plot <- leaflet(height = 1600,options= leafletOptions(padding = 100, zoomSnap = 
   setMapWidgetStyle(list(background = "white")) %>%
   #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
   
+  
+  
+  addPolygons(data = uk.bounds, stroke = T, color = "#DCDCDC",
+              opacity = 1, 
+              fillOpacity = 1, weight = 0.25
+              #highlight= highlightOptions(color="white", weight=2, bringToFront= T)
+  )  %>%
+  
   addPolygons(data = pcons.near.bog, stroke = T, color = "white",
               fillColor = ~cols,
               opacity = 1, 
               fillOpacity = 1, weight = 0.25, label = labels1,  
               #highlight= highlightOptions(color="white", weight=2, bringToFront= T)
   )  %>%
-  
-  
   
   addLegend(colors = rev(cols), 
             labels = c(

@@ -1,5 +1,5 @@
 ---
-title: "Leaflet + Flexdashboard + DT + Crosstalk"
+title: "GA Dashboard"
 author: "WPI Economics"
 output:
   flexdashboard::flex_dashboard:
@@ -7,180 +7,222 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-# prep workspace
-library(dplyr)  # tidy data manipulation
-library(leaflet)  # interative mapping
-library(DT)  # interactive tables
-library(crosstalk)  # inter-widget interactivity
-sch <- readRDS("data/gias_sample.RDS")
-sd <- SharedData$new(sch)
+#Green Alliance dashboard
+
+library(tidyverse)
+library(shiny)
+library(crosstalk)
+library(flexdashboard)
+library(sf)
+library(leaflet)
+library(leaflet.extras)
+library(reactable)
+library(downloadthis)
+library(htmltools)
+
+#Read in data
+df.sf <- readRDS("GA_DB.RDS")
+#download data
+df <- st_drop_geometry(df.sf)
+df.sf <- st_transform(df.sf, 4326)
+
+df.sp <- df.sf %>% as('Spatial')
+
+
+
+
+
+sd <- SharedData$new(df.sf,
+                     key = df.sf$pcon19cd)
+
+sd.map <- SharedData$new(df.sp,
+                     key = df.sp@data$pcon19cd, group = sd$groupName()
+                     
+)
+
 ```
 
 Interactives {data-icon="ion-stats-bars"}
 =====================================  
 
-Column {data-width=400}
+Column {data-width=550}
 -------------------------------------
 
 ### Filters
 
 ```{r filters}
-filter_select(
-  id = "geo_la",
-  label = "Local authority",
-  sharedData = sd,
-  group = ~geo_la
-)
+# filter_select(
+#   id = "geo_pcon",
+#   label = "Constituency",
+#   sharedData = sd,
+#   group = ~`Constituency`
+# )
+
 bscols(
   filter_checkbox(
-    id = "ofsted_rating",
-    label = "Ofsted grade",
+    id = "seagrass",
+    label = "Seagrass within 1000m",
     sharedData = sd,
-    group = ~ofsted_rating
+    group = ~`Seagrass location within 1000m`
   ),
+  
   filter_checkbox(
-    id = "sch_phase",
-    label = "Phase",
+    id = "woodland",
+    label = "Share of woodland (cum %)",
     sharedData = sd,
-    group = ~sch_phase
-  )
-)
-bscols(
-  filter_slider(
-    id = "pupil_count",
-    label = "Pupil count",
-    sharedData = sd,
-    column = ~pupil_count,
-    step = 10,
-    round = TRUE,
-    sep = "",
-    ticks = FALSE
+    group = ~`Share of woodland (cumulative %)`
   ),
-  filter_slider(
-    id = "pupil_percent_fsm",
-    label = "Percentage Free School Meals",
+    filter_checkbox(
+    id = "map",
+    label = "Coastal map test",
     sharedData = sd,
-    column = ~pupil_percent_fsm,
-    step = 1,
-    round = TRUE,
-    sep = "",
-    ticks = FALSE
+    group = ~`Coastal resoration priority sites flag`
   )
 )
+# bscols(
+#   filter_slider(
+#     id = "pupil_count",
+#     label = "Pupil count",
+#     sharedData = sd,
+#     column = ~pupil_count,
+#     step = 10,
+#     round = TRUE,
+#     sep = "",
+#     ticks = FALSE
+#   ),
+#   filter_slider(
+#     id = "pupil_percent_fsm",
+#     label = "Percentage Free School Meals",
+#     sharedData = sd,
+#     column = ~pupil_percent_fsm,
+#     step = 1,
+#     round = TRUE,
+#     sep = "",
+#     ticks = FALSE
+#   )
+# )
 ```
 
 ### Datatable
     
 ```{r datatable}
-sd %>% 
-  DT::datatable(
-    filter = "top",  # allows filtering on each column
-    extensions = c(
-      "Buttons",  # add download buttons, etc
-      "Scroller"  # for scrolling down the rows rather than pagination
-    ),
-    rownames = FALSE,  # remove rownames
-    style = "bootstrap",
-    class = "compact",
-    width = "100%",
-    options = list(
-      dom = "Blrtip",  # specify content (search box, etc)
-      deferRender = TRUE,
-      scrollY = 300,
-      scroller = TRUE,
-      columnDefs = list(
-        list(
-          visible = FALSE,
-          targets = c(2, 3, 5:15)
-        )
-      ), 
-      buttons = list(
-        I("colvis"),  # turn columns on and off
-        "csv",  # download as .csv
-        "excel"  # download as .xlsx
-      )
-    ),
-    colnames = c(
-      "URN" = "sch_urn",
-      "Name" = "sch_name",
-      "Type" = "sch_type",
-      "Type group" = "sch_type_group",
-      "Phase" = "sch_phase",
-      "Ofsted rating" = "ofsted_rating",
-      "Inspection date" = "ofsted_date",
-      "Pupil count" = "pupil_count",
-      "Pupil gender" = "pupil_gender",
-      "FSM per cent" = "pupil_percent_fsm",
-      "Town" = "geo_town",
-      "Postcode" = "geo_postcode",
-      "Local authority" = "geo_la",
-      "Rural-urban class" = "geo_urban_rural",
-      "RSC region" = "geo_rsc_region",
-      "Coordinates" = "geometry"
-    )
+tbl <- reactable(sd, #selection = "multiple",
+                 onClick = "select",
+                 rowStyle = list(cursor = "pointer"),
+                 minRows = 10,filterable = F,searchable = F, wrap = T , defaultPageSize = 15, striped = T, highlight = T,
+                 defaultSorted = list("Constituency" = "asc"),
+                 columns = list(`Seagrass location within 1000m` = colDef(filterable = F),
+                                `Coastal resoration sites flag` = colDef(filterable = F),
+                                `Share of woodland (cumulative %)` = colDef(filterable = F),
+                                `Within 10k of great north bog` = colDef(filterable = F),
+                                `Coastal resoration priority sites flag` = colDef(filterable = F),
+                                geometry = colDef(show = F), 
+                                pcon19cd = colDef(show = F),
+                                cols = colDef(show = F)
+                                ),
+                 #`COVID-19 deaths per 100,000` = colDef(aggregate = "mean",format = colFormat(digits = 0)),
+                 #`COVID-19 deaths age adjusted per 100,000` = colDef(aggregate = "mean",format = colFormat(digits = 0))),
+                 theme = reactableTheme(
+                   stripedColor = "#f3f5f4",
+                   highlightColor = "#8B9C98",
+                   cellPadding = "6px 10px",
+                   style = list(fontFamily = "Franklin Gothic Book", fontSize = "12px"),
+                   #searchInputStyle = list(width = "100%", fontWeight = "400"),
+                   headerStyle = list(color = "white",background = "#00946E",
+                                      "&:hover[aria-sort]" = list(background = "#76B74B"),
+                                      "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "#76B74B"),
+                                      borderColor = "#76B74B"
+                   )
+                 )) 
+
+dl.button <- df %>%
+  download_this(
+    output_name = "NAME_THIS_FILE",
+    output_extension = ".csv",
+    button_label = "Download data as csv",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
   )
+
+combo <- htmltools::tagList(dl.button, tbl) 
+combo
 ```
 
-Column {data-width=600}
+Column {data-width=400}
 -------------------------------------
     
 ### Interactive map
     
 ```{r map}
-sd %>% 
-  leaflet::leaflet() %>%
-  leaflet::addProviderTiles(providers$OpenStreetMap) %>% 
-  leaflet::addAwesomeMarkers(
-    popup = ~paste0(
-      "<h5>", sch$sch_name, "</h5>",
-      
-      "<table style='width:100%'>",
-      
-      "<tr>",
-      "<th>URN</th>",
-      "<th>", sch$sch_urn, "</th>",
-      "</tr>",
-      
-      "<tr>",
-      "<tr>",
-      "<th>Phase</th>",
-      "<th>", sch$sch_phase, "</th>",
-      "</tr>",
-      
-      "<tr>",
-      "<tr>",
-      "<th>Type</th>",
-      "<th>", sch$sch_type, "</th>",
-      "</tr>",
-      
-      "<tr>",
-      "<tr>",
-      "<th>Location</th>",
-      "<th>", sch$geo_town, ", ", sch$geo_postcode, "</th>",
-      "</tr>",
-      
-      "<tr>",
-      "<tr>",
-      "<th>LA</th>",
-      "<th>", sch$geo_la, "</th>",
-      "</tr>"
-    ),  # end popup()
-    icon = awesomeIcons(
-      library = "ion",
-      icon = ifelse(
-        test = sch$ofsted_rating == "1 Outstanding",
-        yes = "ion-android-star-outline",
-        no = "ion-android-radio-button-off"
-      ),
-      iconColor = "white",
-      markerColor = ifelse(
-        test = sch$sch_phase == "Primary", 
-        yes = "red",
-        no = "blue"
-      )
-    )
-  ) %>%   # end addAwesomeMarkers()
-  leaflet::addMeasure()
+
+cols <- c("#f0cfc7",
+          "#dca091",
+          "#c4725f",
+          "#a94330",
+          "#8a0000")
+
+meanval <- mean(df.sf$`Labour market challenge score (100 = average)`)
+sdval <- sd(df.sf$`Labour market challenge score (100 = average)`)
+
+#written long
+very.high <- paste0("Greater than ",round(meanval + (sdval*1.5),0))
+high <- paste0("Greater than ",round(meanval + (sdval*0.5),0) , " and less than ",round(meanval + (sdval*1.5),0)   )
+average <- paste0("Greater than ",round(meanval - (sdval*0.5),0) , " and less than ",round(meanval + (sdval*0.5),0)  )
+low <- paste0("Greater than ", round(meanval - (sdval*1.5),0), " and less than ", round(meanval - (sdval*0.5),0)  )
+very.low <- paste0("Less than ", round(meanval - (sdval*1.5) ,0))
+
+long.cats <- c(very.high, high, average, very.low, low)
+
+#condensed
+very.high.sht <- paste0("> ",round(meanval + (sdval*1.5),0))
+high.sht <- paste0("> ",round(meanval + (sdval*0.5),0) , " <= ",round(meanval + (sdval*1.5),0)   )
+average.sht <- paste0("> ",round(meanval - (sdval*0.5),0) , " <= ",round(meanval + (sdval*0.5),0)  )
+low.sht <- paste0("> ", round(meanval - (sdval*1.5),0), " <= ", round(meanval - (sdval*0.5),0)  )
+very.low.sht <- paste0("<= ", round(meanval - (sdval*1.5) ,0))
+
+short.cats <- c(very.high.sht, high.sht, average.sht, very.low.sht, low.sht)
+
+labels1 <- sprintf("<strong>%s</strong><br/>Challenge score: %s<sup></sup><br/>",
+                   df.sf$Constituency, df.sf$`Labour market challenge score (100 = average)`) %>%
+  lapply(htmltools::HTML)
+
+
+plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = T)) %>%
+  setView(lng =  -3.13,
+          lat = 54.8,zoom = 6.3) %>% #setView gives centre coordinates and zoom level
+
+  setMapWidgetStyle(list(background = "white")) %>%
+  #addProviderTiles(providers$CartoDB.PositronNoLabels, providerTileOptions(opacity = 1) ) %>%
+
+  addPolygons(stroke = T, color = "white",
+              #layerId = ~pcon19cd,
+              fillColor = ~cols,
+              opacity = 1,
+              fillOpacity = 1, weight = 0.25, label = labels1,
+              highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
+
+
+
+  addLegend(colors = rev(cols),
+            labels = c(
+              paste0("Very high (", very.high.sht,")"),
+              paste0("High (",high.sht,")"),
+              paste0("Average (",average.sht,")"),
+              paste0("Low (", low.sht,")"),
+              paste0("Very low (",very.low.sht,")")
+              ),
+            position = "topright",
+            title="Labour market challenge score",
+            opacity=1) %>%
+
+  removeDrawToolbar(clearFeatures = T)
+
+
+plot
+
+  
+  
 ```
 
 Information {data-orientation=rows data-icon="fa-info-circle"}
