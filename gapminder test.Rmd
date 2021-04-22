@@ -8,6 +8,7 @@ theme: lumen
 
 ```{r setup, include=FALSE}
 library(flexdashboard) ; library(crosstalk) ; library(dplyr) ; library(rgdal)
+library(sp)
 ## This is the site works and where I have modified code from: http://rstudio-pubs-static.s3.amazonaws.com/209203_02f14fea3274448bbbf8d04c99c6051b.html
 ## These are the steps for creating (and writing) the SpatialPolygonsDataFrame using data from the gapminder package and the boundary vector layer supplied by www.naturalearthdata.com in the rworldmap package.
 library(gapminder) ; library(countrycode)
