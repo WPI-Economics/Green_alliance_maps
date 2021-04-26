@@ -1,0 +1,114 @@
+---
+title: "Project name"
+author: "Green Alliance"
+output:
+  flexdashboard::flex_dashboard:
+    logo: GAlogo.png
+    theme: paper
+    
+---
+
+```{r setup}
+#Green Alliance dashboard
+
+library(tidyverse)
+library(shiny)
+library(crosstalk)
+library(flexdashboard)
+library(sf)
+library(leaflet)
+library(leaflet.extras)
+library(reactable)
+library(downloadthis)
+library(htmltools)
+library(leafpm)
+library(rgdal)
+
+#Read in data
+
+
+
+df.sf <- readRDS("GA_DB.RDS")
+
+df.sf$`Share of woodland (cumulative %)`<- recode_factor(df.sf$`Share of woodland (cumulative %)`,
+"Very high (27,500 to 45,800)" = "Very high",
+"High (18,500 to 27,500)" = "High",
+"Mid ( 9,500 to 16,500)" = "Mid",
+"Low ( 4,300 to  9,300)" = "Low",
+"Very low (     0 to  4,300)" = "Very low")
+
+
+
+
+
+#download data
+df <- st_drop_geometry(df.sf)
+df <- df %>% select(-cols, -LM2cols, -LM3cols, -LM4cols)
+
+df.sf <- st_transform(df.sf, 4326)
+df.sp <- df.sf %>% as('Spatial')
+
+
+
+sd.df <- SharedData$new(df,
+                     key = df$pcon19cd
+                     )
+
+df.centroids <- df.sf %>% st_centroid()
+df.centroids$lng <- st_coordinates(df.centroids)[,1]
+df.centroids$lat <- st_coordinates(df.centroids)[,2]
+df.centroids <- st_drop_geometry(df.centroids)
+sd.centroid <- SharedData$new(df.centroids,
+                              key = df.centroids$pcon19cd
+                             # , group = sd.df$groupName()
+                              )
+
+sd.df.sp <- SharedData$new(df.sp,
+                     key = df.sp@data$pcon19cd 
+                     #group = sd.df$groupName()
+)
+
+
+
+df.sf <- readRDS("GA_DB.RDS")
+df.sf <- st_transform(df.sf, 4326)
+df.sp <- df.sf %>% as('Spatial')
+sd.map <- SharedData$new(df.sp)
+sd.df <- SharedData$new(df.sp@data, group = sd.map$groupName()) 
+
+
+```
+
+Column {data-width=550}
+-------------------------------------
+#### table
+
+```{r table}
+
+# 
+reactable(sd.centroid, onClick = "select",rowStyle = list(cursor = "pointer"),
+                 #minRows = 10,
+                 filterable = F,
+                 searchable = F, wrap = T, pagination = FALSE, striped = T, highlight = T)
+
+#DT::datatable(sd.df)
+
+```
+Column {data-width=250}
+-------------------------------------
+
+#### Map
+
+```{r map}
+# leaflet(sd.centroid) %>% addPolygons(data = sd.df.sp,color = "#969696", weight = 2, fillColor = "green", fillOpacity = 0.8 ) %>% 
+#   addCircleMarkers( lng = ~lng, lat = ~lat, radius = 3)
+
+
+leaflet(sd.df.sp) %>% addPolygons(data = sd.df.sp,color = "#969696", weight = 2, fillColor = "green", fillOpacity = 0.8, popup = ~Constituency )
+  
+```
+
+
+
+
+

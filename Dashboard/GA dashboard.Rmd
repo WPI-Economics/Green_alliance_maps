@@ -1,5 +1,5 @@
 ---
-title: "Project name"
+title: "Economics of enhancing the natural environment"
 author: "Green Alliance"
 output:
   flexdashboard::flex_dashboard:
@@ -22,6 +22,7 @@ library(reactable)
 library(downloadthis)
 library(htmltools)
 library(leafpm)
+library(rgdal)
 
 #Read in data
 df.sf <- readRDS("GA_DB.RDS")
@@ -39,6 +40,8 @@ df.sf$`Share of woodland (cumulative %)`<- recode_factor(df.sf$`Share of woodlan
 
 #download data
 df <- st_drop_geometry(df.sf)
+df <- df %>% select(-cols, -LM2cols, -LM3cols, -LM4cols)
+
 df.sf <- st_transform(df.sf, 4326)
 
 df.sp <- df.sf %>% as('Spatial')
@@ -50,17 +53,34 @@ df.centroids$lat <- st_coordinates(df.centroids)[,2]
 
 
 sd <- SharedData$new(df,
-                     key = df$pcon19cd)
+                     #key = df$pcon19cd
+                     )
 
 sd.map <- SharedData$new(df.sp,
-                     key = df.sp@data$pcon19cd, group = sd$groupName()
+                     #key = df.sp@data$pcon19cd, 
+                     group = sd$groupName()
                      
 )
 
 sd.centroids <- SharedData$new(df.centroids,
-                               key = ~pcon19cd, 
+                              # key = ~pcon19cd, 
                                group = sd$groupName() )
 
+
+#Pcon shapefile for linking
+
+#pcon.bounds <- readOGR(dsn = "../Pcon 19 shapefile/", layer = "Westminster_Parliamentary_Constituencies_(December_2019)_Boundaries_UK_BUC" )
+#pcon.bounds <- spTransform(pcon.bounds, CRS("+init=epsg:4326"))
+
+pcon.bounds <- readRDS("GA_DB.RDS")
+pcon.bounds <- pcon.bounds %>% as('Spatial')
+
+
+#pcon.bounds <- sp::merge(pcon.bounds, df[,c(1,3)], by = "pcon19cd")
+
+sd.pcon.bounds <- SharedData$new(pcon.bounds,
+                                 #key = ~pcon19cd,
+                                 group = sd$groupName())
 
 #Seagrass points layer
 seagrass.points <- readRDS( file = "seagrass.points.RDS")
@@ -69,15 +89,15 @@ seagrass.points$lng <- st_coordinates(seagrass.points)[,1]
 seagrass.points$lat <- st_coordinates(seagrass.points)[,2]
 seagrass.points <- st_drop_geometry(seagrass.points)
 
-sd.seagrass <- SharedData$new(seagrass.points,
-                              key = ~pcon19cd,
-                              group = sd$groupName() )
+# sd.seagrass <- SharedData$new(seagrass.points,
+#                               key = ~pcon19cd,
+#                               group = sd$groupName() )
 
 
 Coastal.resto <- readRDS(file = "Coastal.resto.RDS")
-sd.coastal.resto <- SharedData$new(Coastal.resto,
-                              key = ~pcon19cd,
-                              group = sd$groupName() )
+# sd.coastal.resto <- SharedData$new(Coastal.resto,
+#                               key = ~pcon19cd,
+#                               group = sd$groupName() )
 
 GNbogs.pcons <- readRDS(file = "../pcons.GN.bog.rds")
 
@@ -88,11 +108,11 @@ GNbogs <- st_union(GNbogs)
 GNbogs <- st_transform(GNbogs, 4326)
 GNbogs <- st_as_sf(GNbogs)
 
-GNbogs.hidden.points <- readRDS(file = "../pcons.GN.bog.rds")
-GNbogs.hidden.points <- st_centroid(GNbogs.hidden.points)
-sd.GNbogs.hidden.points <- SharedData$new(GNbogs.hidden.points,
-                              key = ~pcon19cd,
-                              group = sd$groupName() )
+# GNbogs.hidden.points <- readRDS(file = "../pcons.GN.bog.rds")
+# GNbogs.hidden.points <- st_centroid(GNbogs.hidden.points)
+# sd.GNbogs.hidden.points <- SharedData$new(GNbogs.hidden.points,
+#                               key = ~pcon19cd,
+#                               group = sd$groupName() )
 
 
 
@@ -122,9 +142,16 @@ sd.woodland.pcon.hidden <- SharedData$new(woodland.pcon.hidden,
 Maps and data {data-icon="ion-stats-bars"}
 =====================================  
 
-Column {data-width=650}
+Column {data-width=850}
 -------------------------------------
 
+#### About this visualisation
+
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
 
 <!-- ### Filters -->
 
@@ -160,9 +187,9 @@ Column {data-width=650}
 <!--   ), -->
 <!--     filter_checkbox( -->
 <!--     id = "bog", -->
-<!--     label = "Within 10k of great north bog", -->
+<!--     label = "Within 20 miles of great north bog", -->
 <!--     sharedData = sd, -->
-<!--     group = ~`Within 10k of great north bog` -->
+<!--     group = ~`Within 20 miles of great north bog` -->
 <!--   ) -->
 <!-- ) -->
 
@@ -191,16 +218,17 @@ area.search <- filter_select(
 )
 
 
-tbl <- reactable(sd, #selection = "multiple",
-                 #onClick = "select",
+tbl <- reactable(sd, #selection = "single",
+                 onClick = "select",
                  rowStyle = list(cursor = "pointer"),
                  #minRows = 10,
-                 filterable = T,
+                 filterable = F,
                  searchable = F, wrap = T, pagination = FALSE, striped = T, highlight = T,
                  defaultSorted = list("Constituency" = "asc"),
+                 defaultColDef = colDef(align = "center"),
                 columns = list(
                           pcon19cd = colDef(show = F),
-                          #Constituency = colDef(filterable = F),
+                          Constituency = colDef(align = "left"),
                           #`Labour market challenge score (100 = average)`= colDef(filterable = F),
                           #`Forecast change in employments 2019-2025 (%)`= colDef(filterable = F),
                           #`Underemployment pre-pandemic (% 16-64)`= colDef(filterable = F),
@@ -214,9 +242,10 @@ tbl <- reactable(sd, #selection = "multiple",
 
                           #`Coastal restoration sites flag` = colDef(filterable = T),
                           #`Coastal restoration priority sites flag` = colDef(filterable = T),
-                          #`Within 10k of great north bog` = colDef(filterable = T),
+                          #`Within 20 miles of great north bog` = colDef(filterable = T),
 
                             #geometry = colDef(show = F),
+                          `coastal restoration priority sites flag`  = colDef(show = F),
                             cols = colDef(show = F),
                             LM2cols = colDef(show = F),
                             LM3cols = colDef(show = F),
@@ -234,8 +263,8 @@ tbl <- reactable(sd, #selection = "multiple",
                    style = list(fontFamily = "Franklin Gothic Book", fontSize = "12px"),
                    #searchInputStyle = list(width = "100%", fontWeight = "400"),
                    headerStyle = list(color = "white",background = "#006784",
-                                      "&:hover[aria-sort]" = list(background = "#00946E"),
-                                      "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "#00946E"),
+                                      "&:hover[aria-sort]" = list(background = "#587B7C"),
+                                      "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "#587B7C"),
                                       borderColor = "#00946E"
                    )
                  ))
@@ -287,13 +316,23 @@ dl.button <- df %>%
     icon = "fa fa-save"
   )
 
-combo <- htmltools::tagList(area.search,dl.button,tbl) 
+dl.button.xl <- df %>%
+  download_this(
+    output_name = "NAME_THIS_FILE",
+    output_extension = ".xlsx",
+    button_label = "Download data as EXCEL",
+    button_type = "default",
+    has_icon = TRUE,
+    icon = "fa fa-save"
+  )
+
+combo <- htmltools::tagList(area.search,dl.button,dl.button.xl,tbl) 
 combo
 
 ```
 
 
-Column {data-width=450}{.tabset}
+Column {data-width=250}{.tabset}
 -------------------------------------
 
 ### LM Challenge
@@ -301,6 +340,9 @@ Column {data-width=450}{.tabset}
 ```{r map}
 
 #Adds LM challenge colours as variable
+
+rad <- 3
+
 cols <- c("#f0cfc7",
           "#dca091",
           "#c4725f",
@@ -366,20 +408,35 @@ labels4 <- sprintf("<strong>%s</strong><br/>Underemployment change: %s<sup></sup
 
 plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = T, minZoom = 5.3)) %>%
   setView(lng =  -3.13,
-          lat = 54.8,zoom = 6.3) %>% #setView gives centre coordinates and zoom level
+          lat = 54.8, zoom = 5.7) %>% #setView gives centre coordinates and zoom level
   
   setMapWidgetStyle(list(background = "white")) %>%
+  
+  #add panes to control priority order of layers
+  addMapPane(name = "basemap", zIndex = 410) %>% 
+  addMapPane(name = "overlays", zIndex = 420) %>% 
   
   addProviderTiles(providers$CartoDB.Positron, providerTileOptions(opacity = 0.1),
                    options = providerTileOptions(minZoom = 9, maxZoom = 15)) %>%
   
   
-  addCircleMarkers(data = sd.centroids, lng = ~lng, lat = ~lat, group =  "LM Challenge",
-                   radius = 5,
+  addPolygons(data = sd.pcon.bounds, 
+              stroke = T,
+              color = "black",
+              weight = 1.2,
+              fillOpacity = 0) %>% 
+  
+  
+  #hidden markers for selection filtering
+  addCircleMarkers(data = sd.centroids, 
+                   group = "hidden",
+                   lng = ~lng, lat = ~lat,
+                   radius = rad,
                    weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
+                   opacity = 1,
+                   fillOpacity = 1,
                    fillColor = "blue"
+                  
   ) %>%
   
   
@@ -387,75 +444,62 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
                group = "LM Challenge",
                fillColor = ~cols,
                opacity = 0.5,
-               fillOpacity = 1, weight = 0.25, label = labels1,
-               highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
+               fillOpacity = 0.7, weight = 0.25, label = labels1,
+              
+               highlight= highlightOptions(color="white", weight=2, bringToFront= T),
+               options = leafletOptions(pane = "basemap"))  %>%
   
   
-    addCircleMarkers(data = sd.seagrass, lng = ~lng, lat = ~lat, group =  "Seagrass points",
-                   radius = 5,
-                   weight = 0,
+  addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagrass points",
+                   radius = rad,
+                   weight = 1,
                    fillOpacity = 1,
-                   fillColor = "#00946E",
+                   fillColor = "#006784",
+                   options = leafletOptions(pane = "overlays"),
+                   popup = ~PlaceName
   ) %>%
   
-  addCircleMarkers(data = sd.coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
-                   radius = 5,
+  addCircleMarkers(data = Coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "red"
+                   fillColor = "#EE2E24",
+                  options = leafletOptions(pane = "overlays"),
+                  popup = ~Site_Name
   ) %>%
   
   
-  addPolygons(data = GNbogs, stroke = T, color = "black",
-              group = "`Great Northern Bog`",
+  addPolygons(data = GNbogs, stroke = T, color = "#E2D148",
+              group = "Great North Bog",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5, 
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
   
-  addCircleMarkers(data = sd.GNbogs.hidden.points, lng = ~long, lat = ~lat, group =  "`Great Northern Bog`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
-  
-  
-  
-  
-  addPolygons(data = woodland.pcon, stroke = T, color = "green",
-              group = "`High woodland`",
+
+  addPolygons(data = woodland.pcon, stroke = T, color = "#77A88C",
+              group = "High woodland potential",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5,
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
-  
-  addCircleMarkers(data = sd.woodland.pcon.hidden,
-                   lng = ~long,
-                   lat = ~lat,
-                   group =  "`High woodland`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
+
   addLayersControl(overlayGroups = c("Seagrass points",
                                      "Coastal restoration sites",
-                                     "`Great Northern Bog`",
-                                     "`High woodland`"),
+                                     "Great North Bog",
+                                     "High woodland potential"),
                                                                          
                    options = layersControlOptions(collapsed = FALSE)) %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
-              "`Great Northern Bog`",
-              "`High woodland`"
+              "Great North Bog",
+              "High woodland potential",
+              "hidden"
               )) %>%
   
   addResetMapButton() %>% 
@@ -470,7 +514,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               paste0("Low (", low.sht,")"),
               paste0("Very low (",very.low.sht,")")
             ),
-            position = "topright",
+            position = "bottomright",
             title="Labour market challenge score",
             opacity=0.65) 
 
@@ -509,16 +553,20 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
 
 plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = T, minZoom = 5.3)) %>%
   setView(lng =  -3.13,
-          lat = 54.8,zoom = 6.3) %>% #setView gives centre coordinates and zoom level
+          lat = 54.8,zoom = 5.7) %>% #setView gives centre coordinates and zoom level
   
   setMapWidgetStyle(list(background = "white")) %>%
   
   addProviderTiles(providers$CartoDB.Positron, providerTileOptions(opacity = 0.1),
                    options = providerTileOptions(minZoom = 9, maxZoom = 15)) %>%
   
+    #add panes to control priority order of layers
+  addMapPane(name = "basemap", zIndex = 410) %>% 
+  addMapPane(name = "overlays", zIndex = 420) %>% 
+  
   
   addCircleMarkers(data = sd.centroids, lng = ~lng, lat = ~lat, group =  "LM Challenge",
-                   radius = 5,
+                   radius = rad,
                    weight = 0,
                    opacity = 0,
                    fillOpacity = 0,
@@ -534,70 +582,56 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
                fillOpacity = 1, weight = 0.25, label = labels2,
                highlight= highlightOptions(color="white", weight=2, bringToFront= T))  %>%
   
-      addCircleMarkers(data = sd.seagrass, lng = ~lng, lat = ~lat, group =  "Seagrass points",
-                   radius = 5,
+addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagrass points",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "#00946E",
+                   fillColor = "#006784",
+                   options = leafletOptions(pane = "overlays"),
+                   popup = ~PlaceName
   ) %>%
   
-  addCircleMarkers(data = sd.coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
-                   radius = 5,
+  addCircleMarkers(data = Coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "red"
+                   fillColor = "#EE2E24",
+                  options = leafletOptions(pane = "overlays"),
+                  popup = ~Site_Name
   ) %>%
   
   
-  addPolygons(data = GNbogs, stroke = T, color = "black",
-              group = "`Great Northern Bog`",
+  addPolygons(data = GNbogs, stroke = T, color = "#E2D148",
+              group = "Great North Bog",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5, 
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
   
-  addCircleMarkers(data = sd.GNbogs.hidden.points, lng = ~long, lat = ~lat, group =  "`Great Northern Bog`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
-  
-  
-  
-  
-  addPolygons(data = woodland.pcon, stroke = T, color = "green",
-              group = "`High woodland`",
+
+  addPolygons(data = woodland.pcon, stroke = T, color = "#77A88C",
+              group = "High woodland potential",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5,
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
-  
-  addCircleMarkers(data = sd.woodland.pcon.hidden,
-                   lng = ~long,
-                   lat = ~lat,
-                   group =  "`High woodland`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
+
   addLayersControl(overlayGroups = c("Seagrass points",
                                      "Coastal restoration sites",
-                                     "`Great Northern Bog`",
-                                     "`High woodland`"),
+                                     "Great North Bog",
+                                     "High woodland potential"),
+                                                                         
                    options = layersControlOptions(collapsed = FALSE)) %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
-              "`Great Northern Bog`",
-              "`High woodland`")) %>%
+              "Great North Bog",
+              "High woodland potential"
+              )) %>%
   
   addResetMapButton() %>% 
   
@@ -612,7 +646,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               "Low",
               "Very low"
             ),
-            position = "topright",
+            position = "bottomright",
             title="Forecast change <br>in employments (%)",
             opacity=1) 
   plot
@@ -623,16 +657,19 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
 ```{r map3}
 plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = T, minZoom = 5.3)) %>%
   setView(lng =  -3.13,
-          lat = 54.8,zoom = 6.3) %>% #setView gives centre coordinates and zoom level
+          lat = 54.8,zoom = 5.7) %>% #setView gives centre coordinates and zoom level
   
   setMapWidgetStyle(list(background = "white")) %>%
   
   addProviderTiles(providers$CartoDB.Positron, providerTileOptions(opacity = 0.1),
                    options = providerTileOptions(minZoom = 9, maxZoom = 15)) %>%
   
+    #add panes to control priority order of layers
+  addMapPane(name = "basemap", zIndex = 410) %>% 
+  addMapPane(name = "overlays", zIndex = 420) %>% 
   
   addCircleMarkers(data = sd.centroids, lng = ~lng, lat = ~lat, group =  "LM Challenge",
-                   radius = 5,
+                   radius = rad,
                    weight = 0,
                    opacity = 0,
                    fillOpacity = 0,
@@ -651,70 +688,56 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
 
   
   
-  addCircleMarkers(data = sd.seagrass, lng = ~lng, lat = ~lat, group =  "Seagrass points",
-                   radius = 5,
+  addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagrass points",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "#00946E",
+                   fillColor = "#006784",
+                   options = leafletOptions(pane = "overlays"),
+                   popup = ~PlaceName
   ) %>%
   
-  addCircleMarkers(data = sd.coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
-                   radius = 5,
+  addCircleMarkers(data = Coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "red"
+                   fillColor = "#EE2E24",
+                  options = leafletOptions(pane = "overlays"),
+                  popup = ~Site_Name
   ) %>%
   
   
-  addPolygons(data = GNbogs, stroke = T, color = "black",
-              group = "`Great Northern Bog`",
+  addPolygons(data = GNbogs, stroke = T, color = "#E2D148",
+              group = "Great North Bog",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5, 
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
   
-  addCircleMarkers(data = sd.GNbogs.hidden.points, lng = ~long, lat = ~lat, group =  "`Great Northern Bog`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
-  
-  
-  
-  
-  addPolygons(data = woodland.pcon, stroke = T, color = "green",
-              group = "`High woodland`",
+
+  addPolygons(data = woodland.pcon, stroke = T, color = "#77A88C",
+              group = "High woodland potential",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5,
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
-  
-  addCircleMarkers(data = sd.woodland.pcon.hidden,
-                   lng = ~long,
-                   lat = ~lat,
-                   group =  "`High woodland`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
+
   addLayersControl(overlayGroups = c("Seagrass points",
                                      "Coastal restoration sites",
-                                     "`Great Northern Bog`",
-                                     "`High woodland`"),
+                                     "Great North Bog",
+                                     "High woodland potential"),
+                                                                         
                    options = layersControlOptions(collapsed = FALSE)) %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
-              "`Great Northern Bog`",
-              "`High woodland`")) %>%
+              "Great North Bog",
+              "High woodland potential"
+              )) %>%
   
   addResetMapButton() %>% 
   
@@ -734,7 +757,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               "Very high"
             ),
             labFormat = labelFormat(suffix = "%%"),
-            position = "topright",
+            position = "bottomright",
             title="Underemployment <br>
             Sept 2019 (16-64)",
             opacity=1) 
@@ -747,7 +770,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
 ```{r map4}
 plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, zoomDelta = 0.3, zoomControl = T, minZoom = 5.3)) %>%
   setView(lng =  -3.13,
-          lat = 54.8,zoom = 6.3) %>% #setView gives centre coordinates and zoom level
+          lat = 54.8,zoom = 5.7) %>% #setView gives centre coordinates and zoom level
   
   setMapWidgetStyle(list(background = "white")) %>%
   
@@ -755,8 +778,12 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
                    options = providerTileOptions(minZoom = 9, maxZoom = 15)) %>%
   
   
+    #add panes to control priority order of layers
+  addMapPane(name = "basemap", zIndex = 410) %>% 
+  addMapPane(name = "overlays", zIndex = 420) %>% 
+  
   addCircleMarkers(data = sd.centroids, lng = ~lng, lat = ~lat, group =  "LM Challenge",
-                   radius = 5,
+                   radius = rad,
                    weight = 0,
                    opacity = 0,
                    fillOpacity = 0,
@@ -775,70 +802,56 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
   
   
   
-  addCircleMarkers(data = sd.seagrass, lng = ~lng, lat = ~lat, group =  "Seagrass points",
-                   radius = 5,
+  addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagrass points",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "#00946E",
+                   fillColor = "#006784",
+                   options = leafletOptions(pane = "overlays"),
+                   popup = ~PlaceName
   ) %>%
   
-  addCircleMarkers(data = sd.coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
-                   radius = 5,
+  addCircleMarkers(data = Coastal.resto, lng = ~lng, lat = ~lat, group =  "Coastal restoration sites",
+                   radius = rad,
                    weight = 0,
                    fillOpacity = 1,
-                   fillColor = "red"
+                   fillColor = "#EE2E24",
+                  options = leafletOptions(pane = "overlays"),
+                  popup = ~Site_Name
   ) %>%
   
   
-  addPolygons(data = GNbogs, stroke = T, color = "black",
-              group = "`Great Northern Bog`",
+  addPolygons(data = GNbogs, stroke = T, color = "#E2D148",
+              group = "Great North Bog",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5, 
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
   
-  addCircleMarkers(data = sd.GNbogs.hidden.points, lng = ~long, lat = ~lat, group =  "`Great Northern Bog`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
-  
-  
-  
-  
-  addPolygons(data = woodland.pcon, stroke = T, color = "green",
-              group = "`High woodland`",
+
+  addPolygons(data = woodland.pcon, stroke = T, color = "#77A88C",
+              group = "High woodland potential",
               fillColor = "white",
-              opacity = 0.5,
-              fillOpacity = 0.5, weight = 1
+              opacity = 1,
+              fillOpacity = 0, weight = 1.5,
+              options = leafletOptions(pane = "overlays")
   )  %>%
   
-  
-  addCircleMarkers(data = sd.woodland.pcon.hidden,
-                   lng = ~long,
-                   lat = ~lat,
-                   group =  "`High woodland`",
-                   radius = 5,
-                   weight = 0,
-                   opacity = 0,
-                   fillOpacity = 0,
-                   fillColor = "blue"
-  ) %>%
-  
+
   addLayersControl(overlayGroups = c("Seagrass points",
                                      "Coastal restoration sites",
-                                     "`Great Northern Bog`",
-                                     "`High woodland`"),
+                                     "Great North Bog",
+                                     "High woodland potential"),
+                                                                         
                    options = layersControlOptions(collapsed = FALSE)) %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
-              "`Great Northern Bog`",
-              "`High woodland`" )) %>%
+              "Great North Bog",
+              "High woodland potential"
+              )) %>%
   
   addResetMapButton() %>% 
   
@@ -854,7 +867,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               "90%+"
             ),
             labFormat = labelFormat(suffix = "%%"),
-            position = "topright",
+            position = "bottomright",
             title="Underemployment change<br>
             Sept 2019 to Sept 2020 (%)",
             opacity=1) 

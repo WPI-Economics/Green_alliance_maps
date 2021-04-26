@@ -6,6 +6,20 @@
   
 }
 
+.chart-title{
+    font-family: "Franklin Gothic Book"!important;
+}
+
+/* add padding around the download boxes*/
+
+.btn {
+  margin: 10px;
+}
+
+.navbar-logo{
+  margin-top: 3px;
+}
+
 .navbar-inverse {
   background-color: #006784;
   border-color: #587B7C;

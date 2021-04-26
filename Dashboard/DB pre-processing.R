@@ -40,8 +40,8 @@ Woodland <- st_drop_geometry(Woodland)
 Woodland <- Woodland[,c(1,11,12,13, 16)]
 
 
-#Constituencies within 10k 
-Bog <- read_csv(file = "Constituencies 10 miles from bog.csv")
+#Constituencies within 20 miles 
+Bog <- read_csv(file = "Constituencies 20 miles from bog.csv")
 Bog <- Bog[,c(-1,-3)]
 
 #Coastal retoration areas counts  
@@ -80,7 +80,7 @@ colnames(pcons.merged) <- c("pcon19cd",
                             "All coastal restoration sites (count)",
                             "Coastal restoration sites flag",
                             "Coastal restoration priority sites flag",
-                            "Within 10k of great north bog" ,
+                            "Within 20 miles of great north bog" ,
                             "geometry" )
 
 pcons.merged <- pcons.merged[,-c(9:10)]
@@ -88,8 +88,8 @@ pcons.merged <- pcons.merged[,-c(9:10)]
 pcons.merged$`Seagrass location within 1000m`[pcons.merged$`Seagrass location within 1000m` == T] <- "Yes"
 pcons.merged$`Seagrass location within 1000m`[pcons.merged$`Seagrass location within 1000m` == F] <- "No"
 
-pcons.merged$`Within 10k of great north bog`[pcons.merged$`Within 10k of great north bog` == T] <- "Yes"
-pcons.merged$`Within 10k of great north bog`[pcons.merged$`Within 10k of great north bog` == F] <- "No"
+pcons.merged$`Within 20 miles of great north bog`[pcons.merged$`Within 20 miles of great north bog` == T] <- "Yes"
+pcons.merged$`Within 20 miles of great north bog`[pcons.merged$`Within 20 miles of great north bog` == F] <- "No"
 
 pcons.merged$`Woodland area (ha)` <- round(pcons.merged$`Woodland area (ha)`,0)
 
@@ -187,7 +187,7 @@ saveRDS(seagrass, file = "Dashboard/seagrass.points.RDS")
 
 
 #Coastal restoration sites layer
-Coastal.resto <- geojson_sf("https://opendata.arcgis.com/datasets/59fe52ba9f8744e88eca9cec371fae30_0.geojson")
+Coastal.resto <-geojsonio::geojson_sf("https://opendata.arcgis.com/datasets/59fe52ba9f8744e88eca9cec371fae30_0.geojson")
 Coastal.resto <- Coastal.resto[,c(4)]
 Coastal.resto <- st_centroid(Coastal.resto)
 Coastal.resto$lng <- st_coordinates(Coastal.resto)[,1]
