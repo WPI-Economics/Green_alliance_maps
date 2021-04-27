@@ -16,17 +16,19 @@
   margin: 10px;
 }
 
+
 .navbar-logo{
   margin-top: 3px;
 }
 
-
+/* edits to tabsets */
 .nav-tabs-custom .nav-tabs li.active a {
-  font-size: 10px;;
+  font-size: 11px;
+  
 }
 
 .nav-tabs-custom .nav-tabs li:not(.active) a {
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .navbar-inverse {
