@@ -20,6 +20,15 @@
   margin-top: 3px;
 }
 
+
+.nav-tabs-custom .nav-tabs li.active a {
+  font-size: 10px;;
+}
+
+.nav-tabs-custom .nav-tabs li:not(.active) a {
+  font-size: 10px;
+}
+
 .navbar-inverse {
   background-color: #006784;
   border-color: #587B7C;
