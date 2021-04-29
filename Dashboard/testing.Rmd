@@ -3,7 +3,7 @@ title: "Economics of enhancing the natural environment"
 author: ""
 output:
   flexdashboard::flex_dashboard:
-    logo: GA_logo_RGB900.png
+    logo: GA_logo_RGB96.png
     theme: paper
     css: styles.css
 ---

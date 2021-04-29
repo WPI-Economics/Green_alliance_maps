@@ -12,12 +12,16 @@
 
 
 .body {
-  font-family: "Franklin Gothic Book"!important;
+ 
   font-size: 10px;
 }
 
 .chart-title{
-    font-family: "Franklin Gothic Book"!important;
+   
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 0;
+    padding: 20px 10px 0;
 }
 
 /* add padding around the download boxes*/
@@ -26,7 +30,7 @@
 }
 
 .btn {
-  margin: 10px;
+  margin: 15px;
   font-size: 10px;
 }
 
@@ -45,6 +49,15 @@
 /*logo image*/
 .navbar-logo img{
 height: 57px;
+}
+
+.chart-wrapper, .nav-tabs-custom {
+  border: 0;
+}
+
+
+.chart-shim {
+  top: 0;
 }
 
 /* edits to tabsets */

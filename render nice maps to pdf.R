@@ -11,7 +11,7 @@ map.files.print <- list.files(path = getwd(), pattern = "map.R|Map.R", recursive
 map.files.print <- sub('\\.R$', '', map.files.print)
 map.files.print <- sub('\\.r$', '', map.files.print)
 map.files.print <- map.files.print[c(2,3,4,5,6)]
-#map.files.print <- map.files.print[c(1)]
+#map.files.print <- map.files.print[c(5)]
 
 
 
@@ -46,7 +46,7 @@ webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM4%20Under
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/W1%20woodland%20constituency%20map.html", file = "Maps/W1.png")
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM1_b%20Labour%20market%20challenge%20seagrass%20map.html", file = "Maps/LM1_b.png")
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/B1%20great%20north%20bog%20map.html", file = "Maps/B1.png")
-
+webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM1_c%20Labour%20market%20challenge%20coastal%20resto%20map.html", file = "Maps/LM1_c.png")
 #.PDF
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM1%20Labour%20market%20challenge%20map.html", file = "Maps/LM1.pdf")
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM2%20Forecast%20change%20in%20employments%20map.html", file = "Maps/LM2.pdf")
@@ -55,3 +55,4 @@ webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM4%20Under
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/W1%20woodland%20constituency%20map.html", file = "Maps/W1.pdf")
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM1_b%20Labour%20market%20challenge%20seagrass%20map.html", file = "Maps/LM1_b.pdf")
 webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/B1%20great%20north%20bog%20map.html", file = "Maps/B1.pdf")
+webshot::webshot("file:///Users/guyweir/GIT/Green_alliance_maps/Maps/LM1_c%20Labour%20market%20challenge%20coastal%20resto%20map.html", file = "Maps/LM1_c.pdf")

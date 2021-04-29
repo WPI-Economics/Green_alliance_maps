@@ -40,7 +40,9 @@ df.sf$`Share of woodland`<- recode_factor(df.sf$`Share of woodland`,
 
 #download data
 df <- st_drop_geometry(df.sf)
-df <- df %>% select(-cols, -LM2cols, -LM3cols, -LM4cols)
+df <- as_tibble(df)
+df <- df %>% dplyr::select(-cols, -LM2cols, -LM3cols, -LM4cols)
+#df <- df[,-c(15:18)]
 
 df.sf <- st_transform(df.sf, 4326)
 
@@ -118,7 +120,7 @@ GNbogs <- st_as_sf(GNbogs)
 
 woodland.pcon <- readRDS(file = "../Woodland.pcon.summary.RDS")
 woodland.pcon <- woodland.pcon %>% filter(`Cumulative % share of woodland` %in% c("Very high (27,500 to 45,800)","High (18,500 to 27,500)"))
-woodland.pcon <- woodland.pcon %>% select(pcon19cd, `Cumulative % share of woodland`, `Woodland area (ha)`, long, lat)
+woodland.pcon <- woodland.pcon %>% dplyr::select(pcon19cd, `Cumulative % share of woodland`, `Woodland area (ha)`, long, lat)
 
 
 
@@ -142,7 +144,7 @@ sd.woodland.pcon.hidden <- SharedData$new(woodland.pcon.hidden,
 Maps and data {data-icon="ion-stats-bars"}
 =====================================  
 
-Column {data-width=850}
+Column {data-width=950}
 -------------------------------------
 
 #### Background
@@ -183,14 +185,14 @@ tbl <- reactable(sd, #selection = "single",
                           #`Underemployment change Sept 2019 - Sept 2020 (%)`= colDef(filterable = F),
                           #`Known Seagrass location within 1000m` = colDef(filterable = T),s
                           `Woodland area (ha)` = colDef(filterable = F, format = colFormat(separators = T)),
-                          #`Share of woodland` = colDef(filterable = T),
+                          `Share of woodland` = colDef(filterable = F, show = F),
 
                           `Priority sites coastal restoration sites (count)` = colDef(show = F),
                           `All coastal restoration sites (count)` = colDef(show = F),
 
                           #`Coastal restoration sites flag` = colDef(filterable = T),
                           #`Coastal restoration priority sites flag` = colDef(filterable = T),
-                          #`Within 20 miles of great north bog` = colDef(filterable = T),
+                          #`Within 20 miles of Great North Bog` = colDef(filterable = T),
 
                             #geometry = colDef(show = F),
                           `Coastal restoration priority sites flag`  = colDef(show = F),
@@ -207,7 +209,7 @@ tbl <- reactable(sd, #selection = "single",
                  theme = reactableTheme(
                    stripedColor = "#f3f5f4",
                    highlightColor = "#C3CDC8",
-                   #ellPadding = "4px 8px",
+                   cellPadding = "4px 8px",
                    style = list(fontFamily = "Franklin Gothic Book", fontSize = "10px"),
                    #searchInputStyle = list(width = "100%", fontWeight = "400"),
                    headerStyle = list(color = "white",background = "#54716E",
@@ -280,7 +282,7 @@ combo
 ```
 
 
-Column {data-width=250}{.tabset}
+Column {data-width=150}{.tabset}
 -------------------------------------
 
 ### LM Challenge
@@ -431,7 +433,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               group = "High woodland potential",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.75,
+              fillOpacity = 0, weight = 2,
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -565,7 +567,7 @@ addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagr
               group = "High woodland potential",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.75,
+              fillOpacity = 0, weight = 2,
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -787,7 +789,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               group = "High woodland potential",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5,
+              fillOpacity = 0, weight = 2,
               options = leafletOptions(pane = "overlays")
   )  %>%
   

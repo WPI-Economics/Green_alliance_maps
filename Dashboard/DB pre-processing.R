@@ -80,7 +80,7 @@ colnames(pcons.merged) <- c("pcon19cd",
                             "All coastal restoration sites (count)",
                             "Coastal restoration sites flag",
                             "Coastal restoration priority sites flag",
-                            "Within 20 miles of great north bog" ,
+                            "Within 20 miles of Great North Bog" ,
                             "geometry" )
 
 pcons.merged <- pcons.merged[,-c(9:10)]
@@ -88,8 +88,8 @@ pcons.merged <- pcons.merged[,-c(9:10)]
 pcons.merged$`Known seagrass location within 1000m`[pcons.merged$`Known seagrass location within 1000m` == T] <- "Yes"
 pcons.merged$`Known seagrass location within 1000m`[pcons.merged$`Known seagrass location within 1000m` == F] <- "No"
 
-pcons.merged$`Within 20 miles of great north bog`[pcons.merged$`Within 20 miles of great north bog` == T] <- "Yes"
-pcons.merged$`Within 20 miles of great north bog`[pcons.merged$`Within 20 miles of great north bog` == F] <- "No"
+pcons.merged$`Within 20 miles of Great North Bog`[pcons.merged$`Within 20 miles of Great North Bog` == T] <- "Yes"
+pcons.merged$`Within 20 miles of Great North Bog`[pcons.merged$`Within 20 miles of Great North Bog` == F] <- "No"
 
 pcons.merged$`Woodland area (ha)` <- round(pcons.merged$`Woodland area (ha)`,0)
 
