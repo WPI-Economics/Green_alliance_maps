@@ -1,9 +1,9 @@
 ---
-title: "Economics of enhancing the natural environment"
-author: "Green Alliance"
+title: "Levelling up through green jobs"
+author: ""
 output:
   flexdashboard::flex_dashboard:
-    logo: GAlogo.png
+    logo: GA_logo_RGB.png
     theme: paper
     css: styles.css
 ---
@@ -27,7 +27,7 @@ library(rgdal)
 #Read in data
 df.sf <- readRDS("GA_DB.RDS")
 
-df.sf$`Share of woodland (cumulative %)`<- recode_factor(df.sf$`Share of woodland (cumulative %)`,
+df.sf$`Share of woodland`<- recode_factor(df.sf$`Share of woodland`,
 "Very high (27,500 to 45,800)" = "Very high",
 "High (18,500 to 27,500)" = "High",
 "Mid ( 9,500 to 16,500)" = "Mid",
@@ -145,66 +145,14 @@ Maps and data {data-icon="ion-stats-bars"}
 Column {data-width=850}
 -------------------------------------
 
-#### About this visualisation
+#### Background
 
-This space here can be used to explain some background to the project etc.
-This space here can be used to explain some background to the project etc.
-This space here can be used to explain some background to the project etc.
-This space here can be used to explain some background to the project etc.
-This space here can be used to explain some background to the project etc.
+In 2021, Green Alliance commissioned WPI Economics to research the link between restoring nature and levelling up. Their analysis calculates a labour market challenge score for each constituency and finds that those with the greatest challenges also have the greatest potential for nature restoration. 
 
-<!-- ### Filters -->
+[Policy recommendations](https://green-alliance.org.uk/)
 
-<!-- ```{r filters} -->
+[Full report – Economics of enhancing the natural environment](https://green-alliance.org.uk/)
 
-
-<!-- bscols( -->
-<!--   filter_checkbox( -->
-<!--     id = "seagrass", -->
-<!--     label = "Seagrass within 1000m", -->
-<!--     sharedData = sd, -->
-<!--     group = ~`Seagrass location within 1000m` -->
-<!--   ), -->
-
-<!--   filter_checkbox( -->
-<!--     id = "woodland", -->
-<!--     label = "Share of woodland (cum %)", -->
-<!--     sharedData = sd, -->
-<!--     group = ~`Share of woodland (cumulative %)` -->
-<!--   ), -->
-<!--   filter_checkbox( -->
-<!--     id = "resto1", -->
-<!--     label = "Coastal restoration sites", -->
-<!--     sharedData = sd, -->
-<!--     group = ~`Coastal restoration sites flag` -->
-<!--   ), -->
-
-<!--     filter_checkbox( -->
-<!--     id = "RestoP", -->
-<!--     label = "Coastal restoration priority sites", -->
-<!--     sharedData = sd, -->
-<!--     group = ~`Coastal restoration priority sites flag` -->
-<!--   ), -->
-<!--     filter_checkbox( -->
-<!--     id = "bog", -->
-<!--     label = "Within 20 miles of great north bog", -->
-<!--     sharedData = sd, -->
-<!--     group = ~`Within 20 miles of great north bog` -->
-<!--   ) -->
-<!-- ) -->
-
-<!-- bscols( -->
-<!--   filter_slider( -->
-<!--     id = "LM score", -->
-<!--     label = "Labour Market Challenge score (100 is average)", -->
-<!--     width = "100%", -->
-<!--     sharedData = sd, -->
-<!--     column = ~`Labour market challenge score (100 = average)`) -->
-
-<!--   ) -->
-
-
-<!-- ``` -->
 
 ### Search by constituency name
     
@@ -231,11 +179,11 @@ tbl <- reactable(sd, #selection = "single",
                           Constituency = colDef(align = "left"),
                           #`Labour market challenge score (100 = average)`= colDef(filterable = F),
                           #`Forecast change in employments 2019-2025 (%)`= colDef(filterable = F),
-                          #`Underemployment pre-pandemic (% 16-64)`= colDef(filterable = F),
+                          #`Underemployment Sept 2019 (% 16-64)`= colDef(filterable = F),
                           #`Underemployment change Sept 2019 - Sept 2020 (%)`= colDef(filterable = F),
-                          #`Seagrass location within 1000m` = colDef(filterable = T),
-                          #`Woodland area (ha)` = colDef(filterable = F),
-                          #`Share of woodland (cumulative %)` = colDef(filterable = T),
+                          #`Known Seagrass location within 1000m` = colDef(filterable = T),s
+                          `Woodland area (ha)` = colDef(filterable = F, format = colFormat(separators = T)),
+                          #`Share of woodland` = colDef(filterable = T),
 
                           `Priority sites coastal restoration sites (count)` = colDef(show = F),
                           `All coastal restoration sites (count)` = colDef(show = F),
@@ -258,13 +206,13 @@ tbl <- reactable(sd, #selection = "single",
                  #`COVID-19 deaths age adjusted per 100,000` = colDef(aggregate = "mean",format = colFormat(digits = 0))),
                  theme = reactableTheme(
                    stripedColor = "#f3f5f4",
-                   highlightColor = "#8B9C98",
+                   highlightColor = "#C3CDC8",
                    #ellPadding = "4px 8px",
-                   style = list(fontFamily = "Franklin Gothic Book", fontSize = "12px"),
+                   style = list(fontFamily = "Franklin Gothic Book", fontSize = "10px"),
                    #searchInputStyle = list(width = "100%", fontWeight = "400"),
-                   headerStyle = list(color = "white",background = "#006784",
-                                      "&:hover[aria-sort]" = list(background = "#587B7C"),
-                                      "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "#587B7C"),
+                   headerStyle = list(color = "white",background = "#54716E",
+                                      "&:hover[aria-sort]" = list(background = "#C3CDC8"),
+                                      "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "#C3CDC8"),
                                       borderColor = "#00946E"
                    )
                  ))
@@ -308,7 +256,7 @@ tbl <- reactable(sd, #selection = "single",
 
 dl.button <- df %>%
   download_this(
-    output_name = "NAME_THIS_FILE",
+    output_name = "Economics of natural environment",
     output_extension = ".csv",
     button_label = "Download data as csv",
     button_type = "default",
@@ -318,7 +266,7 @@ dl.button <- df %>%
 
 dl.button.xl <- df %>%
   download_this(
-    output_name = "NAME_THIS_FILE",
+    output_name = "Economics of natural environment",
     output_extension = ".xlsx",
     button_label = "Download data as EXCEL",
     button_type = "default",
@@ -398,7 +346,7 @@ labels2 <- sprintf("<strong>%s</strong><br/>Forecast change in employments: %s<s
   lapply(htmltools::HTML)
 
 labels3 <- sprintf("<strong>%s</strong><br/>Underemployment pre-pandemic: %s<sup></sup><br/>",
-                   df.sf$Constituency, df.sf$`Underemployment pre-pandemic (% 16-64)`) %>%
+                   df.sf$Constituency, df.sf$`Underemployment Sept 2019 (% 16-64)`) %>%
   lapply(htmltools::HTML)
 
 labels4 <- sprintf("<strong>%s</strong><br/>Underemployment change: %s<sup></sup><br/>",
@@ -423,7 +371,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
   addPolygons(data = sd.pcon.bounds, 
               stroke = T,
               color = "black",
-              weight = 1.2,
+              weight = 1.5,
               fillOpacity = 0) %>% 
   
   
@@ -473,7 +421,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               group = "Great North Bog",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5, 
+              fillOpacity = 0, weight = 1.75, 
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -483,9 +431,11 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               group = "High woodland potential",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5,
+              fillOpacity = 0, weight = 1.75,
               options = leafletOptions(pane = "overlays")
   )  %>%
+  
+    addResetMapButton() %>% 
   
 
   addLayersControl(overlayGroups = c("Seagrass points",
@@ -493,7 +443,8 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
                                      "Great North Bog",
                                      "High woodland potential"),
                                                                          
-                   options = layersControlOptions(collapsed = FALSE)) %>%
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = "topright") %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
@@ -502,8 +453,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               "hidden"
               )) %>%
   
-  addResetMapButton() %>% 
-  
+
   
   addLegend(group = "LM Challenge",
             colors = rev(cols),
@@ -514,7 +464,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               paste0("Low (", low.sht,")"),
               paste0("Very low (",very.low.sht,")")
             ),
-            position = "bottomright",
+            position = "topright",
             title="Labour market challenge score",
             opacity=0.65) 
 
@@ -605,7 +555,7 @@ addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagr
               group = "Great North Bog",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5, 
+              fillOpacity = 0, weight = 1.75, 
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -615,7 +565,7 @@ addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagr
               group = "High woodland potential",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5,
+              fillOpacity = 0, weight = 1.75,
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -625,7 +575,8 @@ addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagr
                                      "Great North Bog",
                                      "High woodland potential"),
                                                                          
-                   options = layersControlOptions(collapsed = FALSE)) %>%
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = "topright") %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
@@ -646,7 +597,7 @@ addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagr
               "Low",
               "Very low"
             ),
-            position = "bottomright",
+            position = "topright",
             title="Forecast change <br>in employments (%)",
             opacity=1) 
   plot
@@ -711,7 +662,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               group = "Great North Bog",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5, 
+              fillOpacity = 0, weight = 1.75, 
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -721,7 +672,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               group = "High woodland potential",
               fillColor = "white",
               opacity = 1,
-              fillOpacity = 0, weight = 1.5,
+              fillOpacity = 0, weight = 1.75,
               options = leafletOptions(pane = "overlays")
   )  %>%
   
@@ -731,7 +682,8 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
                                      "Great North Bog",
                                      "High woodland potential"),
                                                                          
-                   options = layersControlOptions(collapsed = FALSE)) %>%
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = "topright") %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
@@ -757,7 +709,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               "Very high"
             ),
             labFormat = labelFormat(suffix = "%%"),
-            position = "bottomright",
+            position = "topright",
             title="Underemployment <br>
             Sept 2019 (16-64)",
             opacity=1) 
@@ -845,7 +797,8 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
                                      "Great North Bog",
                                      "High woodland potential"),
                                                                          
-                   options = layersControlOptions(collapsed = FALSE)) %>%
+                   options = layersControlOptions(collapsed = FALSE),
+                   position = "topright") %>%
   
   hideGroup(c("Seagrass points",
               "Coastal restoration sites",
@@ -867,7 +820,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
               "90%+"
             ),
             labFormat = labelFormat(suffix = "%%"),
-            position = "bottomright",
+            position = "topright",
             title="Underemployment change<br>
             Sept 2019 to Sept 2020 (%)",
             opacity=1) 
@@ -882,9 +835,24 @@ plot
 Information {data-orientation=rows data-icon="fa-info-circle"}
 ===================================== 
 
-### About 
+### Definitions 
 
-Space to write something about Green Alliance and WPI perhaps?
+#### Labour market challenge score
+An index where 100 reflects the average constituency. It is constructed from four measures: underemployment before the pandemic; the increase in underemployment in the year to September 2020; the proportion of the working age population on furlough and SEISS in January 2021; forecast change in employment based on sectoral risk.
+
+#### Seagrass points
+Current and historic known seagrass meadows. This is where restoration is most likely needed but it is likely an underestimate. Seagrass locations were estimated by WPI Economics from named locations provided in [Green at al (2021)](https://www.frontiersin.org/articles/10.3389/fpls.2021.629962/full) but may not represent exact locations.
+
+#### Coastal restoration
+Potential sites for new coastal habitats, identified by the RSPB Sustainable Shores project.
+
+#### Great North Bog
+Outline of the Great North Bog proposal, a peatland restoration initiative being developed by the North Pennines AONB partnership, the Yorkshire Peat Partnership and the Moors for the Future partnership. There is no comprehensive, national mapping of peatland potential currently in the public domain, though the Great North Bog contains 92% of England’s upland peat.
+
+#### High woodland potential
+The constituencies with the highest potential for new woodland, with at least 18,500 hectares per constituency. Potential woodland sites were identified by the RSPB, avoiding carbon rich soils, important non-woodland habitats, nature conservation sites, highly productive farmland and towns and cities.
+
+All further methodology and sources can be found in the [full report](https://green-alliance.org.uk/)
 
 ### How to use this app
 
@@ -915,13 +883,22 @@ You can:
 * click 'CSV' or 'Excel' to download the filtered data to a .csv file or a .xlsx
 * see how many entries remain after filtering in the bottom-left, where it says 'Showing X to Y of Z entries'
 
-### Tools
+#### Tools used
 
 [R v3.6.0](https://www.r-project.org/) and [RStudio v1.3.1093](https://www.rstudio.com/) were used to build this tool.
 
 The packages used were:
 
-* [Flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/) to create a frame for the content
-* [Leaflet](https://rstudio.github.io/leaflet/) for the interactive map
-* [Reactable](https://glin.github.io/reactable/) for the interactive table
-* [Crosstalk](https://rstudio.github.io/crosstalk/) for widget interactivity
+* [Flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/)
+* [Leaflet](https://rstudio.github.io/leaflet/)
+* [Reactable](https://glin.github.io/reactable/)
+* [Crosstalk](https://rstudio.github.io/crosstalk/)
+* [Downloadthis](https://www.rdocumentation.org/packages/downloadthis/versions/0.2.1)
+
+### About us
+
+#### Green Alliance
+Green Alliance is an independent think tank and charity focused on ambitious leadership for the environment. Since 1979, Green Alliance has been working with the most influential leaders in business, NGOs and politics to accelerate political action and create transformative policy for a green and prosperous UK.
+
+#### WPI Economics
+WPI Economics is an economics and public policy consultancy. We are driven by a desire to make a difference, both through the work we undertake and by taking our responsibilities as a business seriously. We provide a range of public, private and charitable clients with research, economic analysis and advice to influence and deliver better outcomes through improved public policy design and delivery. 

@@ -1,114 +1,172 @@
 ---
-title: "Project name"
-author: "Green Alliance"
+title: "Economics of enhancing the natural environment"
+author: ""
 output:
   flexdashboard::flex_dashboard:
-    logo: GAlogo.png
+    logo: GA_logo_RGB900.png
     theme: paper
-    
+    css: styles.css
 ---
 
-```{r setup}
-#Green Alliance dashboard
-
-library(tidyverse)
-library(shiny)
-library(crosstalk)
-library(flexdashboard)
-library(sf)
-library(leaflet)
-library(leaflet.extras)
-library(reactable)
-library(downloadthis)
-library(htmltools)
-library(leafpm)
-library(rgdal)
-
-#Read in data
-
-
-
-df.sf <- readRDS("GA_DB.RDS")
-
-df.sf$`Share of woodland (cumulative %)`<- recode_factor(df.sf$`Share of woodland (cumulative %)`,
-"Very high (27,500 to 45,800)" = "Very high",
-"High (18,500 to 27,500)" = "High",
-"Mid ( 9,500 to 16,500)" = "Mid",
-"Low ( 4,300 to  9,300)" = "Low",
-"Very low (     0 to  4,300)" = "Very low")
-
-
-
-
-
-#download data
-df <- st_drop_geometry(df.sf)
-df <- df %>% select(-cols, -LM2cols, -LM3cols, -LM4cols)
-
-df.sf <- st_transform(df.sf, 4326)
-df.sp <- df.sf %>% as('Spatial')
-
-
-
-sd.df <- SharedData$new(df,
-                     key = df$pcon19cd
-                     )
-
-df.centroids <- df.sf %>% st_centroid()
-df.centroids$lng <- st_coordinates(df.centroids)[,1]
-df.centroids$lat <- st_coordinates(df.centroids)[,2]
-df.centroids <- st_drop_geometry(df.centroids)
-sd.centroid <- SharedData$new(df.centroids,
-                              key = df.centroids$pcon19cd
-                             # , group = sd.df$groupName()
-                              )
-
-sd.df.sp <- SharedData$new(df.sp,
-                     key = df.sp@data$pcon19cd 
-                     #group = sd.df$groupName()
-)
-
-
-
-df.sf <- readRDS("GA_DB.RDS")
-df.sf <- st_transform(df.sf, 4326)
-df.sp <- df.sf %>% as('Spatial')
-sd.map <- SharedData$new(df.sp)
-sd.df <- SharedData$new(df.sp@data, group = sd.map$groupName()) 
+```{r setup, include=FALSE}
 
 
 ```
 
-Column {data-width=550}
+Maps and data {data-icon="ion-stats-bars"}
+=====================================  
+
+Column {data-width=850}
 -------------------------------------
-#### table
 
-```{r table}
+#### About this visualisation
 
-# 
-reactable(sd.centroid, onClick = "select",rowStyle = list(cursor = "pointer"),
-                 #minRows = 10,
-                 filterable = F,
-                 searchable = F, wrap = T, pagination = FALSE, striped = T, highlight = T)
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
+This space here can be used to explain some background to the project etc.
 
-#DT::datatable(sd.df)
+<!-- ### Filters -->
+
+<!-- ```{r filters} -->
+
+
+<!-- bscols( -->
+<!--   filter_checkbox( -->
+<!--     id = "seagrass", -->
+<!--     label = "Seagrass within 1000m", -->
+<!--     sharedData = sd, -->
+<!--     group = ~`Seagrass location within 1000m` -->
+<!--   ), -->
+
+<!--   filter_checkbox( -->
+<!--     id = "woodland", -->
+<!--     label = "Share of woodland (cum %)", -->
+<!--     sharedData = sd, -->
+<!--     group = ~`Share of woodland (cumulative %)` -->
+<!--   ), -->
+<!--   filter_checkbox( -->
+<!--     id = "resto1", -->
+<!--     label = "Coastal restoration sites", -->
+<!--     sharedData = sd, -->
+<!--     group = ~`Coastal restoration sites flag` -->
+<!--   ), -->
+
+<!--     filter_checkbox( -->
+<!--     id = "RestoP", -->
+<!--     label = "Coastal restoration priority sites", -->
+<!--     sharedData = sd, -->
+<!--     group = ~`Coastal restoration priority sites flag` -->
+<!--   ), -->
+<!--     filter_checkbox( -->
+<!--     id = "bog", -->
+<!--     label = "Within 20 miles of great north bog", -->
+<!--     sharedData = sd, -->
+<!--     group = ~`Within 20 miles of great north bog` -->
+<!--   ) -->
+<!-- ) -->
+
+<!-- bscols( -->
+<!--   filter_slider( -->
+<!--     id = "LM score", -->
+<!--     label = "Labour Market Challenge score (100 is average)", -->
+<!--     width = "100%", -->
+<!--     sharedData = sd, -->
+<!--     column = ~`Labour market challenge score (100 = average)`) -->
+
+<!--   ) -->
+
+
+<!-- ``` -->
+
+### Search by constituency name
+    
+```{r datatable}
+
+
 
 ```
-Column {data-width=250}
+
+
+Column {data-width=250}{.tabset}
 -------------------------------------
 
-#### Map
+### LM Challenge
 
 ```{r map}
-# leaflet(sd.centroid) %>% addPolygons(data = sd.df.sp,color = "#969696", weight = 2, fillColor = "green", fillOpacity = 0.8 ) %>% 
-#   addCircleMarkers( lng = ~lng, lat = ~lat, radius = 3)
 
 
-leaflet(sd.df.sp) %>% addPolygons(data = sd.df.sp,color = "#969696", weight = 2, fillColor = "green", fillOpacity = 0.8, popup = ~Constituency )
-  
+
+
+
 ```
 
+### Employment forecast
+
+```{r map2}
 
 
 
+```
+### Underemployment 2019
 
+```{r map3}
+
+
+```
+
+### Underemployment Change
+
+```{r map4}
+
+
+
+```
+
+Information {data-orientation=rows data-icon="fa-info-circle"}
+===================================== 
+
+### About 
+
+Space to write something about Green Alliance and WPI perhaps?
+
+### How to use this app
+
+#### Filters
+
+You can:
+
+* Select one or more constituencies from the dropdown menu (remove them with your backspace key)
+* Filter the table from the spaces under the column headings
+* Filter the table using the map selection tool
+
+#### Interactive map
+
+You can:
+
+* click to grab and drag the map around
+* zoom with the '+' and '--' buttons (top-left) or with your mouse's scroll wheel
+* click an area to reveal a popup with information about that constituency
+* click the button showing a broken square (top-left under the zoom options) to select points on the map using a window that's draggable (click and hold the grid icon in the upper left) and resizeable (click and drag the white boxes in each corner)
+
+#### Interactive table
+
+You can:
+
+* filter each column by typing in the boxes under each column header
+* sort the columns (ascending and descending) by clicking on the column header
+* change which columns are visible by clicking the Column visibility button
+* click 'CSV' or 'Excel' to download the filtered data to a .csv file or a .xlsx
+* see how many entries remain after filtering in the bottom-left, where it says 'Showing X to Y of Z entries'
+
+### Tools
+
+[R v3.6.0](https://www.r-project.org/) and [RStudio v1.3.1093](https://www.rstudio.com/) were used to build this tool.
+
+The packages used were:
+
+* [Flexdashboard](https://rmarkdown.rstudio.com/flexdashboard/) to create a frame for the content
+* [Leaflet](https://rstudio.github.io/leaflet/) for the interactive map
+* [Reactable](https://glin.github.io/reactable/) for the interactive table
+* [Crosstalk](https://rstudio.github.io/crosstalk/) for widget interactivity

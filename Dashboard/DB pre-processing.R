@@ -16,7 +16,7 @@ colnames(GA.1) <- c("Constituency",
                     "ONS Code",
                     "Relative labour market challenge score (100 = average constituency)",
                     "Forecast change in employments 2019-2025 (%)",
-                    "Underemployment pre-pandemic (% 16-64)",
+                    "Underemployment Sept 2019 (% 16-64)",
                     "Underemployment change Sept 2019 - Sept 2020 (%)")
 
 
@@ -69,13 +69,13 @@ colnames(pcons.merged) <- c("pcon19cd",
                             "Constituency",
                             "Labour market challenge score (100 = average)",
                             "Forecast change in employments 2019-2025 (%)",
-                            "Underemployment pre-pandemic (% 16-64)",
+                            "Underemployment Sept 2019 (% 16-64)",
                             "Underemployment change Sept 2019 - Sept 2020 (%)",
-                            "Seagrass location within 1000m",
+                            "Known seagrass location within 1000m",
                             "Woodland area (ha)",
                             "Constituency area (ha)", 
                             "Woodland (%)",                  
-                            "Share of woodland (cumulative %)",
+                            "Share of woodland",
                             "Priority sites coastal restoration sites (count)",
                             "All coastal restoration sites (count)",
                             "Coastal restoration sites flag",
@@ -85,8 +85,8 @@ colnames(pcons.merged) <- c("pcon19cd",
 
 pcons.merged <- pcons.merged[,-c(9:10)]
 
-pcons.merged$`Seagrass location within 1000m`[pcons.merged$`Seagrass location within 1000m` == T] <- "Yes"
-pcons.merged$`Seagrass location within 1000m`[pcons.merged$`Seagrass location within 1000m` == F] <- "No"
+pcons.merged$`Known seagrass location within 1000m`[pcons.merged$`Known seagrass location within 1000m` == T] <- "Yes"
+pcons.merged$`Known seagrass location within 1000m`[pcons.merged$`Known seagrass location within 1000m` == F] <- "No"
 
 pcons.merged$`Within 20 miles of great north bog`[pcons.merged$`Within 20 miles of great north bog` == T] <- "Yes"
 pcons.merged$`Within 20 miles of great north bog`[pcons.merged$`Within 20 miles of great north bog` == F] <- "No"
@@ -141,15 +141,15 @@ pcons.merged$LM2cols[pcons.merged$`Forecast change in employments 2019-2025 (%)`
 pcons.merged$LM2cols[pcons.merged$`Forecast change in employments 2019-2025 (%)` <= meanval - (sdval*1.5)] <- LM2cols[1] #ebc3b9 LT -1.5 SD from mean VERY LOW
 
 #LM3
-sdval <- sd(pcons.merged$`Underemployment pre-pandemic (% 16-64)`) #standard deviation of the data
-meanval <- mean(pcons.merged$`Underemployment pre-pandemic (% 16-64)`) 
+sdval <- sd(pcons.merged$`Underemployment Sept 2019 (% 16-64)`) #standard deviation of the data
+meanval <- mean(pcons.merged$`Underemployment Sept 2019 (% 16-64)`) 
 
 pcons.merged$LM3cols <- NA
-pcons.merged$LM3cols[pcons.merged$`Underemployment pre-pandemic (% 16-64)` > meanval + (sdval*1.5)] <- cols[5] #8a0000 greater than 1.5 SD from mean VERY HIGH
-pcons.merged$LM3cols[pcons.merged$`Underemployment pre-pandemic (% 16-64)` < meanval + (sdval*1.5)] <- cols[4] #b04f3b between +0.5 and +1.5 SD of mean HIGH
-pcons.merged$LM3cols[pcons.merged$`Underemployment pre-pandemic (% 16-64)` < meanval + (sdval*0.5)] <- cols[3] #d18978 between -0.5 and +0.5 SD of mean AVERAGE              
-pcons.merged$LM3cols[pcons.merged$`Underemployment pre-pandemic (% 16-64)` < meanval - (sdval*0.5)] <- cols[2] #ebc3b9 between -1.5 and -0.5 SD from mean LOW
-pcons.merged$LM3cols[pcons.merged$`Underemployment pre-pandemic (% 16-64)` < meanval - (sdval*1.5)] <- cols[1] #ebc3b9 LT -1.5 SD from mean VERY LOW
+pcons.merged$LM3cols[pcons.merged$`Underemployment Sept 2019 (% 16-64)` > meanval + (sdval*1.5)] <- cols[5] #8a0000 greater than 1.5 SD from mean VERY HIGH
+pcons.merged$LM3cols[pcons.merged$`Underemployment Sept 2019 (% 16-64)` < meanval + (sdval*1.5)] <- cols[4] #b04f3b between +0.5 and +1.5 SD of mean HIGH
+pcons.merged$LM3cols[pcons.merged$`Underemployment Sept 2019 (% 16-64)` < meanval + (sdval*0.5)] <- cols[3] #d18978 between -0.5 and +0.5 SD of mean AVERAGE              
+pcons.merged$LM3cols[pcons.merged$`Underemployment Sept 2019 (% 16-64)` < meanval - (sdval*0.5)] <- cols[2] #ebc3b9 between -1.5 and -0.5 SD from mean LOW
+pcons.merged$LM3cols[pcons.merged$`Underemployment Sept 2019 (% 16-64)` < meanval - (sdval*1.5)] <- cols[1] #ebc3b9 LT -1.5 SD from mean VERY LOW
 
 
 #LM4
@@ -164,7 +164,7 @@ pcons.merged$LM4cols[pcons.merged$`Underemployment change Sept 2019 - Sept 2020 
 
 pcons.merged$`Labour market challenge score (100 = average)` <- round(pcons.merged$`Labour market challenge score (100 = average)`,0)
 pcons.merged$`Forecast change in employments 2019-2025 (%)` <- round(pcons.merged$`Forecast change in employments 2019-2025 (%)`*100 ,1)
-pcons.merged$`Underemployment pre-pandemic (% 16-64)` <- round(pcons.merged$`Underemployment pre-pandemic (% 16-64)`*100 ,1)
+pcons.merged$`Underemployment Sept 2019 (% 16-64)` <- round(pcons.merged$`Underemployment Sept 2019 (% 16-64)`*100 ,1)
 pcons.merged$`Underemployment change Sept 2019 - Sept 2020 (%)` <- round(pcons.merged$`Underemployment change Sept 2019 - Sept 2020 (%)`*100 ,1)
 
 
