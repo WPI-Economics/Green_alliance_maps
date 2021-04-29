@@ -193,7 +193,7 @@ tbl <- reactable(sd, #selection = "single",
                           #`Within 20 miles of great north bog` = colDef(filterable = T),
 
                             #geometry = colDef(show = F),
-                          `coastal restoration priority sites flag`  = colDef(show = F),
+                          `Coastal restoration priority sites flag`  = colDef(show = F),
                             cols = colDef(show = F),
                             LM2cols = colDef(show = F),
                             LM3cols = colDef(show = F),
