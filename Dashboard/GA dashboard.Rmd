@@ -1,5 +1,5 @@
 ---
-title: "Levelling up through green jobs"
+title: "Jobs for a green recovery"
 author: ""
 output:
   flexdashboard::flex_dashboard:
@@ -151,9 +151,9 @@ Column {data-width=950}
 
 In 2021, Green Alliance commissioned WPI Economics to research the link between restoring nature and levelling up. Their analysis calculates a labour market challenge score for each constituency and finds that those with the greatest challenges also have the greatest potential for nature restoration. 
 
-[Policy recommendations](https://green-alliance.org.uk/)
+[Policy recommendations](https://green-alliance.org.uk/resources/Jobs_for_a_green_recovery.pdf)
 
-[Full report – Economics of enhancing the natural environment](https://green-alliance.org.uk/)
+[Full report – Economics of enhancing the natural environment](https://green-alliance.org.uk/resources/Green_renewal_WPI.pdf)
 
 
 ### Search by constituency name
@@ -210,9 +210,9 @@ tbl <- reactable(sd, #selection = "single",
                    stripedColor = "#f3f5f4",
                    highlightColor = "#C3CDC8",
                    cellPadding = "4px 8px",
-                   style = list(fontFamily = "Franklin Gothic Book", fontSize = "10px"),
+                   style = list(fontFamily = "Franklin Gothic Book", fontSize = "9px"),
                    #searchInputStyle = list(width = "100%", fontWeight = "400"),
-                   headerStyle = list(color = "white",background = "#54716E",
+                   headerStyle = list(color = "white",background = "#54716E", weight = "normal", fontSize = "9px",
                                       "&:hover[aria-sort]" = list(background = "#C3CDC8"),
                                       "&[aria-sort='ascending'], &[aria-sort='descending']" = list(background = "#C3CDC8"),
                                       borderColor = "#00946E"
@@ -402,7 +402,7 @@ plot <- leaflet(sd.map, options= leafletOptions(padding = 100, zoomSnap = 0.25, 
   
   addCircleMarkers(data = seagrass.points, lng = ~lng, lat = ~lat, group =  "Seagrass points",
                    radius = rad,
-                   weight = 1,
+                   weight = 0,
                    fillOpacity = 1,
                    fillColor = "#006784",
                    options = leafletOptions(pane = "overlays"),

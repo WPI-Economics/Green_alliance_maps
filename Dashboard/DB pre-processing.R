@@ -117,6 +117,10 @@ LM4cols <- c("#adb8e6", #blue
           "#8a0000")
 
 
+
+
+
+
 meanval <- mean(pcons.merged$`Labour market challenge score (100 = average)`)
 sdval <- sd(pcons.merged$`Labour market challenge score (100 = average)`)
 
