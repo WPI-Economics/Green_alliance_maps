@@ -144,7 +144,7 @@ sd.woodland.pcon.hidden <- SharedData$new(woodland.pcon.hidden,
 Maps and data {data-icon="ion-stats-bars"}
 =====================================  
 
-Column {data-width=950}
+Column {data-width=975}
 -------------------------------------
 
 #### Background
@@ -282,7 +282,7 @@ combo
 ```
 
 
-Column {data-width=150}{.tabset}
+Column {data-width=125}{.tabset}
 -------------------------------------
 
 ### LM Challenge
